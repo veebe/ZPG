@@ -132,17 +132,31 @@
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="Callbacks.cpp" />
+    <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="DrawableObject.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Model.cpp" />
+    <ClCompile Include="ModelBush.cpp" />
+    <ClCompile Include="ModelSphere.cpp" />
+    <ClCompile Include="ModelSuzi.cpp" />
+    <ClCompile Include="ModelTree.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="ShaderProgram.cpp" />
+    <ClCompile Include="Transformation.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
     <ClInclude Include="Callbacks.h" />
+    <ClInclude Include="Camera.h" />
+    <ClInclude Include="DrawableObject.h" />
     <ClInclude Include="Model.h" />
+    <ClInclude Include="ModelBush.h" />
+    <ClInclude Include="ModelSphere.h" />
+    <ClInclude Include="ModelSuzi.h" />
+    <ClInclude Include="ModelTree.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="ShaderProgram.h" />
+    <ClInclude Include="Transformation.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

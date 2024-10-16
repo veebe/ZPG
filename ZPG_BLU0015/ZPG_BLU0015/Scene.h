@@ -5,17 +5,24 @@
 #include <stdio.h>
 #include <vector>
 
-#include "Model.h"
 #include "ShaderProgram.h"
+#include "DrawableObject.h"
+#include "Transformation.h"
+#include "Camera.h"
 
 using namespace std;
 
 class Scene {
 public:
     Scene(GLFWwindow* window);
-    void AddModel(std::vector<float> Amodel, ShaderProgram* ASP);
+    void AddDrawableObject(Model* Amodel, ShaderProgram* ASP, Transformation* ATransformation);
+    void RemoveDO() { drawableObjects.pop_back(); };
     void Draw();
+    void ScaleDrawableObject(int AObject, float AScale);
+    void MoveDrawableObject(int AObject, float x, float y, float z);
+    void SpinDrawableObject(int AObject, float x, float y, float z);
 private:
     GLFWwindow* window;
-    vector<Model*> models;
+    vector<DrawableObject*> drawableObjects;
+    Camera* camera;
 };

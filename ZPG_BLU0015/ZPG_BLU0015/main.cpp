@@ -7,9 +7,9 @@
 int main(void)
 {
 
-	Application* app = new Application();
+	Application& app = Application::getInstance();
 
-	app->Initialization();
-	app->CreateModels();
-	app->Run();
+	app.Initialization();
+	app.CreateModels();
+	app.Run();
 }

@@ -5,10 +5,12 @@
 
 class Model {
 public:
-	Model(std::vector<float> Amodel, ShaderProgram* ASP);
-	void DrawModel();
+	Model();
+	Model(std::vector<float> AModel);
+	virtual void DrawModel();
 private:
-	ShaderProgram* shaderprogram;
-	GLuint VAO;
 	std::vector<float> model;
+protected:
+	void BindVAO(GLuint AVBO);
+	GLuint VAO;
 };

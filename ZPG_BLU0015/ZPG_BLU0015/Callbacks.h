@@ -4,6 +4,8 @@
 #include <GLFW/glfw3.h>  
 #include <stdlib.h>
 #include <stdio.h>
+//#include "Scene.h"
+//#include "Application.h"
 
 class Callbacks
 {
@@ -26,6 +28,6 @@ public:
 
 private:
 	GLFWwindow* window;
-
+	//Application* application;
 };
 

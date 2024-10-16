@@ -1,17 +1,18 @@
 #include "Callbacks.h"
 
 Callbacks::Callbacks(GLFWwindow* window) {
+
 	this->window = window;
 
 	glfwSetErrorCallback(error_callback);
 
-	
+	/*
 	glfwSetKeyCallback(window, [](GLFWwindow* window, int key, int scancode, int action, int mods) {
 		Callbacks* callbacks = static_cast<Callbacks*>(glfwGetWindowUserPointer(window));
 		if (callbacks) {
 			callbacks->key_callback(window, key, scancode, action, mods);
 		}
-		});
+	});*/
 
 	glfwSetCursorPosCallback(window, cursor_callback);
 
@@ -30,8 +31,7 @@ void Callbacks::key_callback(GLFWwindow* window, int key, int scancode, int acti
 {
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, GL_TRUE);
-	printf("key_callback [%d,%d,%d,%d] \n", key, scancode, action, mods);
-
+	//printf("key_callback [%d,%d,%d,%d] \n", key, scancode, action, mods);
 }
 
 void Callbacks::window_focus_callback(GLFWwindow* window, int focused) { printf("window_focus_callback \n"); }

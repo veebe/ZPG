@@ -37,3 +37,22 @@ void ShaderProgram::CheckShader() {
 void ShaderProgram::UseShader(){
 	glUseProgram(SPID);
 }
+
+void ShaderProgram::DeleteShader() {
+	glDeleteProgram(SPID);
+}
+
+void ShaderProgram::ApplyTransformation(glm::mat4 M) {
+	GLint idModelTransform = glGetUniformLocation(SPID, "modelMatrix");
+	glUniformMatrix4fv(idModelTransform, 1, GL_FALSE, &M[0][0]);
+}
+
+void ShaderProgram::ApplyProjection(glm::mat4 M) {
+	GLint idModelTransform = glGetUniformLocation(SPID, "projectionMatrix");
+	glUniformMatrix4fv(idModelTransform, 1, GL_FALSE, &M[0][0]);
+}
+
+void ShaderProgram::ApplyView(glm::mat4 M) {
+	GLint idModelTransform = glGetUniformLocation(SPID, "viewMatrix");
+	glUniformMatrix4fv(idModelTransform, 1, GL_FALSE, &M[0][0]);
+}
