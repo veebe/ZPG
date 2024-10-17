@@ -1,7 +1,7 @@
 #include "ShaderProgram.h"
 
 ShaderProgram::ShaderProgram(const GLchar* AVertexShader, const GLchar* AFragmentShader) {
-	
+
 	GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
 	glShaderSource(vertexShader, 1, &AVertexShader, NULL);
 	glCompileShader(vertexShader);
@@ -33,6 +33,11 @@ void ShaderProgram::CheckShader() {
 	}
 }
 
+void ShaderProgram::AddCamera(Camera* ACamera) {
+	this->camera = ACamera;
+	this->camera->RegisterObserver(this);
+}
+
 
 void ShaderProgram::UseShader(){
 	glUseProgram(SPID);
@@ -47,12 +52,18 @@ void ShaderProgram::ApplyTransformation(glm::mat4 M) {
 	glUniformMatrix4fv(idModelTransform, 1, GL_FALSE, &M[0][0]);
 }
 
-void ShaderProgram::ApplyProjection(glm::mat4 M) {
-	GLint idModelTransform = glGetUniformLocation(SPID, "projectionMatrix");
-	glUniformMatrix4fv(idModelTransform, 1, GL_FALSE, &M[0][0]);
+void ShaderProgram::OnCameraChangedView()
+{
+	GLuint idModelTransform = glGetUniformLocation(this->SPID, "viewMatrix");
+	if (idModelTransform == -1)
+		exit;
+	glProgramUniformMatrix4fv(this->SPID, idModelTransform, 1, GL_FALSE, glm::value_ptr(camera->GetViewMatrix()));
 }
 
-void ShaderProgram::ApplyView(glm::mat4 M) {
-	GLint idModelTransform = glGetUniformLocation(SPID, "viewMatrix");
-	glUniformMatrix4fv(idModelTransform, 1, GL_FALSE, &M[0][0]);
+void ShaderProgram::OnCameraChangedProjection()
+{
+	GLuint idModelTransform = glGetUniformLocation(this->SPID, "projectionMatrix");
+	if (idModelTransform == -1)
+		exit;
+	glProgramUniformMatrix4fv(this->SPID, idModelTransform, 1, GL_FALSE, glm::value_ptr(camera->GetProjectionMatrix()));
 }

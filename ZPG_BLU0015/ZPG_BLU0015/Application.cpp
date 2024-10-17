@@ -3,6 +3,12 @@
 void Application::Run() {
 	glEnable(GL_DEPTH_TEST);
 	while (!glfwWindowShouldClose(window)) {
+		float currentTime = glfwGetTime();
+		deltaTime = currentTime - lastTime;
+		lastTime = currentTime;
+
+		ProcessInput(this->window);
+
 		scenes[activeScene]->Draw();
 	}
 	glfwDestroyWindow(window);
@@ -15,6 +21,29 @@ void Application::NextScene() {
 		activeScene = 0;
 	else
 		activeScene++;
+
+	glfwSetCursorPos(this->window, scenes[activeScene]->GetLastCursorPosition().x, scenes[activeScene]->GetLastCursorPosition().y);
+}
+
+void Application::SetActiveSceneLastCursorPos(float x, float y) {
+	scenes[activeScene]->SetLastCursorPosition(x, y);
+}
+
+
+void Application::ProcessInput(GLFWwindow* window)
+{
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+		MoveActiveCamera(FORWARD, deltaTime);
+	}
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+		MoveActiveCamera(BACKWARD, deltaTime);
+	}
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+		MoveActiveCamera(LEFT, deltaTime);
+	}
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+		MoveActiveCamera(RIGHT, deltaTime);
+	}
 }
 
 void Application::Initialization() {
@@ -39,8 +68,6 @@ void Application::Initialization() {
 	callbacks = new Callbacks(window);
 
 	glfwSetWindowUserPointer(window, callbacks);
-
-	glfwSetKeyCallback(this->window, key_callback);
 
 	glewExperimental = GL_TRUE;
 	glewInit();
@@ -69,21 +96,28 @@ void Application::CreateModels() {
 	ModelSuzi* modelSuzi = new ModelSuzi;
 	ModelSphere* modelSphere = new ModelSphere;
 
-	
-	
-	scenes[0]->AddDrawableObject(modelSuzi, new ShaderProgram(vertex_shader_color_transform, fragment_shader_normal), new Transformation());
-	//scenes[0]->AddDrawableObject(modelSphere, new ShaderProgram(vertex_shader_color_transform, fragment_shader_brown), new Transformation());
-	//scenes[0]->AddDrawableObject(modelSuzi, new ShaderProgram(vertex_shader_color_transform, fragment_shader_color), new Transformation());
+	TransformationComposite* tc = new TransformationComposite();
+	tc->AddTransformation(new TransformationRotate(1.f, 1.f, 1.f));
+	tc->AddTransformation(new TransformationScale(5.f));
+	tc->AddTransformation(new TransformationTranslate(1.f, 1.f, 1.f));
 
-	scenes[0]->ScaleDrawableObject(0, 0.7);
+	
+	scenes[0]->AddDrawableObject(modelSuzi, new ShaderProgram(vertex_shader_color_transform, fragment_shader_normal), tc);
+
+	TransformationComposite* tc2 = dynamic_cast<TransformationComposite*>(tc->Clone());
+	tc2->AddTransformation(new TransformationTranslate(5.f,5.f,5.f));
+	scenes[0]->AddDrawableObject(modelSphere, new ShaderProgram(vertex_shader_color_transform, fragment_shader_brown), tc2);
+	//scenes[0]->AddDrawableObject(modelSuzi, new ShaderProgram(vertex_shader_color_transform, fragment_shader_color), new Transformation());
+	/*
+	scenes[0]->ScaleDrawableObject(0, 5);
 	scenes[0]->SpinDrawableObject(0, 0,0, 3);
 	
 	scenes[0]->MoveDrawableObject(1, -0.4, -0.4, 0.5);
 	scenes[0]->ScaleDrawableObject(1, 0.2);
 
 	scenes[0]->MoveDrawableObject(2, 0.4, -0.4, 0.5);
-	scenes[0]->ScaleDrawableObject(2, 0.2);
-	
+	scenes[0]->ScaleDrawableObject(2, 0.2);*/
+	/*
 	scenes[1]->AddDrawableObject(modelTree, new ShaderProgram(vertex_shader_color_transform, fragment_shader_color), new Transformation());
 	scenes[1]->AddDrawableObject(modelTree, new ShaderProgram(vertex_shader_color_transform,fragment_shader_brown), new Transformation());
 	scenes[1]->AddDrawableObject(modelTree, new ShaderProgram(vertex_shader_color_transform, fragment_shader_green), new Transformation());
@@ -139,7 +173,7 @@ void Application::CreateModels() {
 
 	scenes[1]->MoveDrawableObject(11, -0.1, -0.55, 0);
 	scenes[1]->ScaleDrawableObject(11, 0.3);
-	
+	*/
 }
 
 void Application::ScaleSceneObject(int AObject, float AScale) {
@@ -154,45 +188,27 @@ void Application::SpinSceneObject(int AObject, float x, float y, float z) {
 	scenes[activeScene]->SpinDrawableObject(AObject, x,y,z);
 }
 
+void Application::MoveActiveCamera(double x, double y) {
+	scenes[activeScene]->MoveActiveCamera(x, y);
+}
+
+void Application::MoveActiveCamera(Direction Adirection, float ADeltaTime) {
+	scenes[activeScene]->MoveActiveCamera(Adirection, ADeltaTime);
+}
+
+//float Application::GetDeltaTime() {
+//	return deltaTime;
+//}
+
+void Application::ToggleCursorLock() {
+	if (glfwGetInputMode(window, GLFW_CURSOR) == GLFW_CURSOR_DISABLED)
+		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+	else if (glfwGetInputMode(window, GLFW_CURSOR) == GLFW_CURSOR_NORMAL)
+		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+}
 
 Application& Application::getInstance()
 {
 	static Application app;
 	return app;
-}
-
-void Application::key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
-{
-	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-		glfwSetWindowShouldClose(window, GL_TRUE);
-	printf("key_callback [%d,%d,%d,%d] \n", key, scancode, action, mods);
-
-	if (key == GLFW_KEY_Q && action == GLFW_PRESS) {
-		Application::getInstance().NextScene();
-		
-	}
-
-	if (key == GLFW_KEY_W && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
-		Application::getInstance().ScaleSceneObject(0, 0.95f);
-	}
-
-	if (key == GLFW_KEY_S && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
-		Application::getInstance().ScaleSceneObject(0, 1.05f);
-	}
-
-	if (key == GLFW_KEY_A && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
-		Application::getInstance().MoveSceneObject(0, 0.05f, 0, 0);
-	}
-
-	if (key == GLFW_KEY_D && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
-		Application::getInstance().MoveSceneObject(0, -0.05f, 0, 0);
-	}
-
-	if (key == GLFW_KEY_R && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
-		Application::getInstance().SpinSceneObject(0, 0, 1, 0);
-	}
-
-	if (key == GLFW_KEY_T && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
-		Application::getInstance().SpinSceneObject(0, 0, 1, 0);
-	}
 }

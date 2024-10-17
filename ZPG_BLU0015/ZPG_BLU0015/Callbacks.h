@@ -5,7 +5,10 @@
 #include <stdlib.h>
 #include <stdio.h>
 //#include "Scene.h"
-//#include "Application.h"
+
+//#include "Camera.h"
+
+class Application;
 
 class Callbacks
 {

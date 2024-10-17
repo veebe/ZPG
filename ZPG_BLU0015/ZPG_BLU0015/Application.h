@@ -1,3 +1,5 @@
+#pragma once
+
 #include <vector>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>  
@@ -10,26 +12,38 @@
 #include "ModelSuzi.h"
 #include "ModelSphere.h"
 
+
+
 class Application {
 public:
     void Run();
     void CreateModels();
     void Initialization();
     void NextScene();
+	void ToggleCursorLock();
+
+	void MoveActiveCamera(double x, double y);
+	void MoveActiveCamera(Direction Adirection, float ADeltaTime);
+
 	void ScaleSceneObject(int AObject, float AScale);
 	void MoveSceneObject(int AObject, float x, float y, float z);
 	void SpinSceneObject(int AObject, float x, float y, float z);
 
-    static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
+	//float GetDeltaTime();
+	void SetActiveSceneLastCursorPos(float x, float y);
+
     static Application& getInstance();
 private:
 
     Application() = default;
+	void ProcessInput(GLFWwindow* window);
 	std::vector<Scene*> scenes;
     GLFWwindow* window;
     Callbacks* callbacks;
 
     int activeScene;
+	float lastTime = 0.0f;
+	float deltaTime = 0.0f;
 
 	const char* vertex_shader_basic =
 		"#version 330\n"

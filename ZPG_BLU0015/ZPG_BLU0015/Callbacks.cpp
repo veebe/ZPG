@@ -1,4 +1,5 @@
 #include "Callbacks.h"
+#include "Application.h"
 
 Callbacks::Callbacks(GLFWwindow* window) {
 
@@ -6,13 +7,13 @@ Callbacks::Callbacks(GLFWwindow* window) {
 
 	glfwSetErrorCallback(error_callback);
 
-	/*
+	
 	glfwSetKeyCallback(window, [](GLFWwindow* window, int key, int scancode, int action, int mods) {
 		Callbacks* callbacks = static_cast<Callbacks*>(glfwGetWindowUserPointer(window));
 		if (callbacks) {
 			callbacks->key_callback(window, key, scancode, action, mods);
 		}
-	});*/
+	});
 
 	glfwSetCursorPosCallback(window, cursor_callback);
 
@@ -31,7 +32,39 @@ void Callbacks::key_callback(GLFWwindow* window, int key, int scancode, int acti
 {
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, GL_TRUE);
-	//printf("key_callback [%d,%d,%d,%d] \n", key, scancode, action, mods);
+	printf("key_callback [%d,%d,%d,%d] \n", key, scancode, action, mods);
+
+	if (key == GLFW_KEY_Q && action == GLFW_PRESS) {
+		Application::getInstance().NextScene();
+		
+	}
+	/*
+	if (key == GLFW_KEY_W ) { 
+		Application::getInstance().MoveActiveCamera(FORWARD, Application::getInstance().GetDeltaTime());
+	}
+
+	if (key == GLFW_KEY_S ) {
+		
+		Application::getInstance().MoveActiveCamera(BACKWARD, Application::getInstance().GetDeltaTime());
+	}
+
+	if (key == GLFW_KEY_A ) {
+		
+		Application::getInstance().MoveActiveCamera(LEFT, Application::getInstance().GetDeltaTime());
+	}
+
+	if (key == GLFW_KEY_D ) {
+	
+		Application::getInstance().MoveActiveCamera(RIGHT, Application::getInstance().GetDeltaTime());
+	}*/
+
+	if (key == GLFW_KEY_R && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
+		//Application::getInstance().SpinSceneObject(0, 0, 1, 0);
+	}
+
+	if (key == GLFW_KEY_T && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
+		Application::getInstance().ToggleCursorLock();
+	}
 }
 
 void Callbacks::window_focus_callback(GLFWwindow* window, int focused) { printf("window_focus_callback \n"); }
@@ -43,8 +76,12 @@ void Callbacks::window_size_callback(GLFWwindow* window, int width, int height) 
 	glViewport(0, 0, width, height);
 }
 
-void Callbacks::cursor_callback(GLFWwindow* window, double x, double y) { printf("cursor_callback \n"); }
+void Callbacks::cursor_callback(GLFWwindow* window, double x, double y) { 
+	Application::getInstance().MoveActiveCamera(x, y);
+	Application::getInstance().SetActiveSceneLastCursorPos(x, y);
+}
 
 void Callbacks::button_callback(GLFWwindow* window, int button, int action, int mode) {
-	if (action == GLFW_PRESS) printf("button_callback [%d,%d,%d]\n", button, action, mode);
+	printf("button_callback [%d,%d,%d]\n", button, action, mode);
+		
 }

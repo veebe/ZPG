@@ -1,25 +1,36 @@
 #include "DrawableObject.h"
 
-DrawableObject::DrawableObject(Model* Amodel, ShaderProgram* ASP, Transformation* ATransformation) {
+DrawableObject::DrawableObject(Model* Amodel, ShaderProgram* ASP, Transformation* ATransformation, Camera* ACamera) {
 	this->model = Amodel;
 	this->shaderprogram = ASP;
 	this->transformation = ATransformation;
+	this->camera = ACamera;
+
+	InitMatrixes();
 };
+
+void DrawableObject::InitMatrixes() {
+	this->shaderprogram->AddCamera(this->camera);
+	this->shaderprogram->OnCameraChangedView();
+	this->shaderprogram->OnCameraChangedProjection();
+	this->shaderprogram->ApplyTransformation(transformation->GetTransformationMatrix());
+}
+
 void DrawableObject::DrawObject() {
 	this->shaderprogram->ApplyTransformation(transformation->GetTransformationMatrix());
-	this->shaderprogram->ApplyProjection(glm::perspective(glm::radians(90.0f), (float)4 / (float)3, 0.1f, 100.0f));
-	this->shaderprogram->ApplyView(glm::lookAt(glm::vec3(0.0f, 0.0f, 10.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f)));
+	//this->shaderprogram->ApplyProjection();
+	//this->shaderprogram->ApplyView();
 	this->shaderprogram->UseShader();
 	this->model->DrawModel();
 	//this->shaderprogram->DeleteShader();
 };
 void DrawableObject::ScaleObject(float s) {
-	this->transformation->Scale(s);
+	//this->transformation->Scale(s);
 }
 void DrawableObject::MoveObject(float x, float y, float z){
-	this->transformation->Translate(x,y,z);
+	//this->transformation->Translate(x,y,z);
 }
 
 void DrawableObject::SpinObject(float x, float y, float z) {
-	this->transformation->Rotate(x,y,z);
+	//this->transformation->Rotate(x,y,z);
 }

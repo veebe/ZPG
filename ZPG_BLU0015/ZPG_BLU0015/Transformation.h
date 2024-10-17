@@ -6,16 +6,13 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <cstdlib>
-#include <ctime>
-#include <random>
+#include <vector>
+
 
 class Transformation {
 public:
-	Transformation();
-	void Rotate(float x, float y, float z);
-	void Scale(float scale);
-	void Translate(float x, float y, float z);
-	glm::mat4 GetTransformationMatrix();
-private:
-	glm::mat4 M;
+	virtual ~Transformation() = default;
+	virtual glm::mat4 GetTransformationMatrix() = 0;
+
+	virtual Transformation* Clone() const = 0;
 };
