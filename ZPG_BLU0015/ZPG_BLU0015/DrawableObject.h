@@ -2,19 +2,20 @@
 #include "Model.h"
 #include "ShaderProgram.h"
 #include "Transformation.h"
+#include "TransformationComposite.h"
+#include "TransformationRotate.h"
+#include "TransformationScale.h"
+#include "TransformationTranslate.h"
 #include "Camera.h"
 
 class DrawableObject {
 public:
-	DrawableObject(Model* Amodel, ShaderProgram* ASP, Transformation* ATransformation, Camera* ACamera);
+	DrawableObject(Model* Amodel, ShaderProgram* ASP, TransformationComposite* ATransformation, Camera* ACamera);
 	void DrawObject();
-	void ScaleObject(float s);
-	void MoveObject(float x, float y, float z);
-	void SpinObject(float x, float y, float z);
 	void InitMatrixes();
 private:
 	Model* model;
 	ShaderProgram* shaderprogram;
-	Transformation* transformation;
+	TransformationComposite* transformation;
 	Camera* camera;
 };

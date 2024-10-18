@@ -1,6 +1,6 @@
 #include "DrawableObject.h"
 
-DrawableObject::DrawableObject(Model* Amodel, ShaderProgram* ASP, Transformation* ATransformation, Camera* ACamera) {
+DrawableObject::DrawableObject(Model* Amodel, ShaderProgram* ASP, TransformationComposite* ATransformation, Camera* ACamera) {
 	this->model = Amodel;
 	this->shaderprogram = ASP;
 	this->transformation = ATransformation;
@@ -17,20 +17,10 @@ void DrawableObject::InitMatrixes() {
 }
 
 void DrawableObject::DrawObject() {
-	this->shaderprogram->ApplyTransformation(transformation->GetTransformationMatrix());
-	//this->shaderprogram->ApplyProjection();
-	//this->shaderprogram->ApplyView();
+
 	this->shaderprogram->UseShader();
+	this->shaderprogram->ApplyTransformation(transformation->GetTransformationMatrix());
 	this->model->DrawModel();
+	
 	//this->shaderprogram->DeleteShader();
 };
-void DrawableObject::ScaleObject(float s) {
-	//this->transformation->Scale(s);
-}
-void DrawableObject::MoveObject(float x, float y, float z){
-	//this->transformation->Translate(x,y,z);
-}
-
-void DrawableObject::SpinObject(float x, float y, float z) {
-	//this->transformation->Rotate(x,y,z);
-}

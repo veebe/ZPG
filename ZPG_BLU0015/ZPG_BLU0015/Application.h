@@ -12,6 +12,7 @@
 #include "ModelSuzi.h"
 #include "ModelSphere.h"
 
+#include"TransformationBuilder.h"
 
 
 class Application {
@@ -24,10 +25,6 @@ public:
 
 	void MoveActiveCamera(double x, double y);
 	void MoveActiveCamera(Direction Adirection, float ADeltaTime);
-
-	void ScaleSceneObject(int AObject, float AScale);
-	void MoveSceneObject(int AObject, float x, float y, float z);
-	void SpinSceneObject(int AObject, float x, float y, float z);
 
 	//float GetDeltaTime();
 	void SetActiveSceneLastCursorPos(float x, float y);

@@ -24,11 +24,8 @@ struct CurosrPos {
 class Scene {
 public:
     Scene(GLFWwindow* window);
-    void AddDrawableObject(Model* Amodel, ShaderProgram* ASP, Transformation* ATransformation);
+    void AddDrawableObject(Model* Amodel, ShaderProgram* ASP, TransformationComposite* ATransformation);
     void Draw();
-    void ScaleDrawableObject(int AObject, float AScale);
-    void MoveDrawableObject(int AObject, float x, float y, float z);
-    void SpinDrawableObject(int AObject, float x, float y, float z);
 
     void MoveActiveCamera(double x, double y);
     void MoveActiveCamera(Direction Adirection, float ADeltaTime);

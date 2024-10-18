@@ -96,96 +96,49 @@ void Application::CreateModels() {
 	ModelSuzi* modelSuzi = new ModelSuzi;
 	ModelSphere* modelSphere = new ModelSphere;
 
-	TransformationComposite* tc = new TransformationComposite();
-	tc->AddTransformation(new TransformationRotate(1.f, 1.f, 1.f));
-	tc->AddTransformation(new TransformationScale(5.f));
-	tc->AddTransformation(new TransformationTranslate(1.f, 1.f, 1.f));
+	ShaderProgram* sp = new ShaderProgram(vertex_shader_color_transform,fragment_shader_normal);
+	ShaderProgram* sp2 = new ShaderProgram(vertex_shader_color_transform, fragment_shader_normal);
 
+	TransformationBuilder builder;
+
+	TransformationComposite* sun_t = builder.ROTATE(0.f, 0.05f, 0.f, true)
+											.SCALE(4.f).Build();
+	scenes[0]->AddDrawableObject(modelSuzi, sp, sun_t);
+
+	TransformationBuilder builder2;
+	TransformationComposite* earth_t = builder2.SCALE(1.f)
+											.ROTATE(0.f, 0.1f, 0.0f, true)
+											.TRANSLATE(10.f, -1.f, 10.f)
+											.ROTATE(0.f, 0.2f, 0.0f, true)
+											.Build();
+	scenes[0]->AddDrawableObject(modelSuzi, sp, earth_t);
 	
-	scenes[0]->AddDrawableObject(modelSuzi, new ShaderProgram(vertex_shader_color_transform, fragment_shader_normal), tc);
-
-	TransformationComposite* tc2 = dynamic_cast<TransformationComposite*>(tc->Clone());
-	tc2->AddTransformation(new TransformationTranslate(5.f,5.f,5.f));
-	scenes[0]->AddDrawableObject(modelSphere, new ShaderProgram(vertex_shader_color_transform, fragment_shader_brown), tc2);
-	//scenes[0]->AddDrawableObject(modelSuzi, new ShaderProgram(vertex_shader_color_transform, fragment_shader_color), new Transformation());
-	/*
-	scenes[0]->ScaleDrawableObject(0, 5);
-	scenes[0]->SpinDrawableObject(0, 0,0, 3);
+	TransformationBuilder builder3;
+	TransformationComposite* moon_t = builder3.COMPONENT(earth_t)
+											.SCALE(0.5f)
+											.ROTATE(0.f, 0.1f, 0.f, true)
+											.TRANSLATE(5.f, -1.f, 5.f)
+											.ROTATE(0.f, 0.2f, 0.f, true)
+											.Build();
+	scenes[0]->AddDrawableObject(modelSuzi, sp, moon_t);
 	
-	scenes[0]->MoveDrawableObject(1, -0.4, -0.4, 0.5);
-	scenes[0]->ScaleDrawableObject(1, 0.2);
+	TransformationBuilder builder4;
+	TransformationBuilder builder5;
+	TransformationBuilder builder6;
+	TransformationBuilder builder7;
+	TransformationBuilder builder8;
 
-	scenes[0]->MoveDrawableObject(2, 0.4, -0.4, 0.5);
-	scenes[0]->ScaleDrawableObject(2, 0.2);*/
-	/*
-	scenes[1]->AddDrawableObject(modelTree, new ShaderProgram(vertex_shader_color_transform, fragment_shader_color), new Transformation());
-	scenes[1]->AddDrawableObject(modelTree, new ShaderProgram(vertex_shader_color_transform,fragment_shader_brown), new Transformation());
-	scenes[1]->AddDrawableObject(modelTree, new ShaderProgram(vertex_shader_color_transform, fragment_shader_green), new Transformation());
-	scenes[1]->AddDrawableObject(modelTree, new ShaderProgram(vertex_shader_color_transform, fragment_shader_color), new Transformation());;
-	scenes[1]->AddDrawableObject(modelBush, new ShaderProgram(vertex_shader_color_transform, fragment_shader_green), new Transformation());
-	
+	TransformationComposite* tc1 = builder4.Build();
+	TransformationComposite* tc2 = builder5.TRANSLATE(5, 1, 4).SCALE(1.5f).Build();
+	TransformationComposite* tc3 = builder6.TRANSLATE(2, 1, 10).SCALE(2.f).Build();
+	TransformationComposite* tc4 = builder7.TRANSLATE(9, 1, 1).SCALE(2.6f).Build();
+	TransformationComposite* tc5 = builder8.TRANSLATE(15, 1, 8).SCALE(1.3f).Build();
 
-	scenes[1]->AddDrawableObject(modelBush, new ShaderProgram(vertex_shader_color_transform, fragment_shader_color), new Transformation());
-	scenes[1]->AddDrawableObject(modelBush, new ShaderProgram(vertex_shader_color_transform, fragment_shader_brown), new Transformation());
-	scenes[1]->AddDrawableObject(modelBush, new ShaderProgram(vertex_shader_color_transform, fragment_shader_green), new Transformation());
-	scenes[1]->AddDrawableObject(modelBush, new ShaderProgram(vertex_shader_color_transform, fragment_shader_color), new Transformation());
-	scenes[1]->AddDrawableObject(modelBush, new ShaderProgram(vertex_shader_color_transform, fragment_shader_green), new Transformation());
-	scenes[1]->AddDrawableObject(modelBush, new ShaderProgram(vertex_shader_color_transform, fragment_shader_color), new Transformation());
-	scenes[1]->AddDrawableObject(modelTree, new ShaderProgram(vertex_shader_color_transform, fragment_shader_brown), new Transformation());
-	
-
-	scenes[1]->MoveDrawableObject(0, -0.9, -0.5, 0);
-	scenes[1]->ScaleDrawableObject(0, 0.1);
-	scenes[1]->SpinDrawableObject(0,5,5,3);
-
-	scenes[1]->MoveDrawableObject(1, -0.5, -0.55, 1);
-	scenes[1]->ScaleDrawableObject(1, 0.16);
-
-	scenes[1]->MoveDrawableObject(2, 0, -0.55, 0);
-	scenes[1]->ScaleDrawableObject(2, 0.09);
-	scenes[1]->SpinDrawableObject(2, 15, 6, 5);
-
-	scenes[1]->MoveDrawableObject(3, 0.5, -0.5, 0);
-	scenes[1]->ScaleDrawableObject(3, 0.2);
-
-	scenes[1]->MoveDrawableObject(4, 1, -0.55, 0);
-	scenes[1]->ScaleDrawableObject(4, 0.15);
-	scenes[1]->SpinDrawableObject(4, 8, 160, 1);
-
-
-	scenes[1]->MoveDrawableObject(5, -0.8, -0.55, 0);
-	scenes[1]->ScaleDrawableObject(5, 0.4);
-
-	scenes[1]->MoveDrawableObject(6, -0.6, -0.55, 0);
-	scenes[1]->ScaleDrawableObject(6, 0.3);
-
-	scenes[1]->MoveDrawableObject(7, 0.1, -0.55, 0);
-	scenes[1]->ScaleDrawableObject(7, 0.4);
-
-	scenes[1]->MoveDrawableObject(8, 0.3, -0.55, 0);
-	scenes[1]->ScaleDrawableObject(8, 0.3);
-
-	scenes[1]->MoveDrawableObject(9, 0.9, -0.55, 0);
-	scenes[1]->ScaleDrawableObject(9, 0.5);
-	
-	scenes[1]->MoveDrawableObject(10, -0.7, -0.55, 0);
-	scenes[1]->ScaleDrawableObject(10, 0.4);
-
-	scenes[1]->MoveDrawableObject(11, -0.1, -0.55, 0);
-	scenes[1]->ScaleDrawableObject(11, 0.3);
-	*/
-}
-
-void Application::ScaleSceneObject(int AObject, float AScale) {
-	scenes[activeScene]->ScaleDrawableObject(AObject, AScale);
-}
-
-void Application::MoveSceneObject(int AObject, float x, float y, float z) {
-	scenes[activeScene]->MoveDrawableObject(AObject, x,y,z);
-}
-
-void Application::SpinSceneObject(int AObject, float x, float y, float z) {
-	scenes[activeScene]->SpinDrawableObject(AObject, x,y,z);
+	scenes[1]->AddDrawableObject(modelTree, sp2, tc1);
+	scenes[1]->AddDrawableObject(modelTree, sp2, tc2);
+	scenes[1]->AddDrawableObject(modelTree, sp2, tc3);
+	scenes[1]->AddDrawableObject(modelTree, sp2, tc4);
+	scenes[1]->AddDrawableObject(modelBush, sp2, tc5);
 }
 
 void Application::MoveActiveCamera(double x, double y) {
