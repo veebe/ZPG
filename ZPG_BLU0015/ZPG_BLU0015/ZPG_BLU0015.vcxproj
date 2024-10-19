@@ -145,6 +145,7 @@
     <ClCompile Include="Transformation.cpp" />
     <ClCompile Include="TransformationBuilder.cpp" />
     <ClCompile Include="TransformationComposite.cpp" />
+    <ClCompile Include="TransformationRandomizer.cpp" />
     <ClCompile Include="TransformationRotate.cpp" />
     <ClCompile Include="TransformationScale.cpp" />
     <ClCompile Include="TransformationTranslate.cpp" />
@@ -159,12 +160,14 @@
     <ClInclude Include="ModelSphere.h" />
     <ClInclude Include="ModelSuzi.h" />
     <ClInclude Include="ModelTree.h" />
-    <ClInclude Include="Observer.h" />
+    <ClInclude Include="IObserver.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="ShaderProgram.h" />
+    <ClInclude Include="ISubject.h" />
     <ClInclude Include="Transformation.h" />
     <ClInclude Include="TransformationBuilder.h" />
     <ClInclude Include="TransformationComposite.h" />
+    <ClInclude Include="TransformationRandomizer.h" />
     <ClInclude Include="TransformationRotate.h" />
     <ClInclude Include="TransformationScale.h" />
     <ClInclude Include="TransformationTranslate.h" />

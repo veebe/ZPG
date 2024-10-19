@@ -35,7 +35,7 @@ void ShaderProgram::CheckShader() {
 
 void ShaderProgram::AddCamera(Camera* ACamera) {
 	this->camera = ACamera;
-	this->camera->RegisterObserver(this);
+	this->camera->Attach(this);
 }
 
 

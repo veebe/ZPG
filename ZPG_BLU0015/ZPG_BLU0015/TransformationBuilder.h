@@ -3,7 +3,6 @@
 #include "TransformationRotate.h"
 #include "TransformationTranslate.h"
 #include "TransformationScale.h"
-#include <glm/gtc/matrix_transform.hpp>
 
 class TransformationBuilder {
 public:
@@ -15,7 +14,6 @@ public:
     TransformationBuilder& TRANSLATE(float x, float y, float z);
 
     TransformationComposite* Build();
-    void Reset();
 
 private:
     TransformationComposite* composite;

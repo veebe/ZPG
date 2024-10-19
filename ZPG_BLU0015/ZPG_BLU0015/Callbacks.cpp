@@ -32,7 +32,7 @@ void Callbacks::key_callback(GLFWwindow* window, int key, int scancode, int acti
 {
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, GL_TRUE);
-	printf("key_callback [%d,%d,%d,%d] \n", key, scancode, action, mods);
+	//printf("key_callback [%d,%d,%d,%d] \n", key, scancode, action, mods);
 
 	if (key == GLFW_KEY_Q && action == GLFW_PRESS) {
 		Application::getInstance().NextScene();

@@ -27,8 +27,3 @@ TransformationBuilder& TransformationBuilder::TRANSLATE(float x, float y, float 
 TransformationComposite* TransformationBuilder::Build() {
     return composite;
 }
-
-void TransformationBuilder::Reset() {
-    delete composite;  
-    composite = new TransformationComposite(); 
-}

@@ -1,7 +1,5 @@
 #include "Scene.h"
 
-
-
 Scene::Scene(GLFWwindow* window){
     this->window = window;
 	this->camera = new Camera();

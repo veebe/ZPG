@@ -50,13 +50,17 @@ void Camera::MoveCameraWithMouse(double x, double y) {
 		this->pitch = 89.0f;
 	if (this->pitch < -89.0f)
 		this->pitch = -89.0f;
-	glm::vec3 front;
-	front.x = cos(glm::radians(this->yaw)) * cos(glm::radians(this->pitch));
-	front.y = sin(glm::radians(this->pitch));
-	front.z = sin(glm::radians(this->yaw)) * cos(glm::radians(this->pitch));
-	this->target = glm::normalize(front);
 
-	NotifyObservers(VIEWMATRIX);
+	float yaw_rad = glm::radians(this->yaw);
+	float pitch_rad = glm::radians(this->pitch);
+
+	glm::vec3 ltarget;
+	ltarget.x = cos(yaw_rad) * cos(pitch_rad);
+	ltarget.y = sin(pitch_rad);
+	ltarget.z = sin(yaw_rad) * cos(pitch_rad);
+	this->target = glm::normalize(ltarget);
+
+	Notify(VIEWMATRIX);
 }
 
 void Camera::MoveCameraWithArrows(Direction Adirection, float ADeltaTime) {
@@ -73,21 +77,27 @@ void Camera::MoveCameraWithArrows(Direction Adirection, float ADeltaTime) {
 	case RIGHT:
 		this->eye += glm::normalize(glm::cross(this->target, this->up)) * (this->speed * ADeltaTime);
 		break;
+	case UP:
+		this->eye += this->up * (this->speed * ADeltaTime);
+		break;
+	case DOWN:
+		this->eye -= this->up * (this->speed * ADeltaTime);
+		break;
 	default:
 		break;
 	}
-	NotifyObservers(VIEWMATRIX);
+	Notify(VIEWMATRIX);
 }
 
-void Camera::RegisterObserver(Observer* Aobserver) {
+void Camera::Attach(IObserver* Aobserver) {
 	observers.push_back(Aobserver);
 }
 
-void Camera::RemoveObserver(Observer* Aobserver) {
+void Camera::Detach(IObserver* Aobserver) {
 	observers.erase(std::remove(observers.begin(), observers.end(), Aobserver), observers.end());
 }
 
-void Camera::NotifyObservers(NotifyType Atype) {
+void Camera::Notify(NotifyType Atype) {
 	switch (Atype) {
 	case VIEWMATRIX:
 		for (auto observer : observers) {

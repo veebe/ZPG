@@ -44,6 +44,12 @@ void Application::ProcessInput(GLFWwindow* window)
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
 		MoveActiveCamera(RIGHT, deltaTime);
 	}
+	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
+		MoveActiveCamera(UP, deltaTime);
+	}
+	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
+		MoveActiveCamera(DOWN, deltaTime);
+	}
 }
 
 void Application::Initialization() {
@@ -96,49 +102,38 @@ void Application::CreateModels() {
 	ModelSuzi* modelSuzi = new ModelSuzi;
 	ModelSphere* modelSphere = new ModelSphere;
 
-	ShaderProgram* sp = new ShaderProgram(vertex_shader_color_transform,fragment_shader_normal);
+	ShaderProgram* sp = new ShaderProgram(vertex_shader_color_transform, fragment_shader_normal);
 	ShaderProgram* sp2 = new ShaderProgram(vertex_shader_color_transform, fragment_shader_normal);
 
 	TransformationBuilder builder;
+	TransformationBuilder builder2;
+	TransformationBuilder builder3;
 
 	TransformationComposite* sun_t = builder.ROTATE(0.f, 0.05f, 0.f, true)
-											.SCALE(4.f).Build();
+		.SCALE(4.f).Build();
 	scenes[0]->AddDrawableObject(modelSuzi, sp, sun_t);
 
-	TransformationBuilder builder2;
 	TransformationComposite* earth_t = builder2.SCALE(1.f)
-											.ROTATE(0.f, 0.1f, 0.0f, true)
-											.TRANSLATE(10.f, -1.f, 10.f)
-											.ROTATE(0.f, 0.2f, 0.0f, true)
-											.Build();
+		.ROTATE(0.f, 0.1f, 0.0f, true)
+		.TRANSLATE(15.f, -1.f, 15.f)
+		.ROTATE(0.f, 0.2f, 0.0f, true)
+		.Build();
 	scenes[0]->AddDrawableObject(modelSuzi, sp, earth_t);
-	
-	TransformationBuilder builder3;
+
 	TransformationComposite* moon_t = builder3.COMPONENT(earth_t)
-											.SCALE(0.5f)
-											.ROTATE(0.f, 0.1f, 0.f, true)
-											.TRANSLATE(5.f, -1.f, 5.f)
-											.ROTATE(0.f, 0.2f, 0.f, true)
-											.Build();
+		.SCALE(0.5f)
+		.ROTATE(0.f, 0.1f, 0.f, true)
+		.TRANSLATE(5.f, -1.f, 5.f)
+		.ROTATE(0.f, 0.2f, 0.f, true)
+		.Build();
 	scenes[0]->AddDrawableObject(modelSuzi, sp, moon_t);
-	
-	TransformationBuilder builder4;
-	TransformationBuilder builder5;
-	TransformationBuilder builder6;
-	TransformationBuilder builder7;
-	TransformationBuilder builder8;
 
-	TransformationComposite* tc1 = builder4.Build();
-	TransformationComposite* tc2 = builder5.TRANSLATE(5, 1, 4).SCALE(1.5f).Build();
-	TransformationComposite* tc3 = builder6.TRANSLATE(2, 1, 10).SCALE(2.f).Build();
-	TransformationComposite* tc4 = builder7.TRANSLATE(9, 1, 1).SCALE(2.6f).Build();
-	TransformationComposite* tc5 = builder8.TRANSLATE(15, 1, 8).SCALE(1.3f).Build();
 
-	scenes[1]->AddDrawableObject(modelTree, sp2, tc1);
-	scenes[1]->AddDrawableObject(modelTree, sp2, tc2);
-	scenes[1]->AddDrawableObject(modelTree, sp2, tc3);
-	scenes[1]->AddDrawableObject(modelTree, sp2, tc4);
-	scenes[1]->AddDrawableObject(modelBush, sp2, tc5);
+	for (int i = 0; i < 100; i++)
+	{
+		scenes[1]->AddDrawableObject(modelTree, sp2, TransformationRandomizer::CreateRandomTransformation());
+		scenes[1]->AddDrawableObject(modelBush, sp2, TransformationRandomizer::CreateRandomTransformation());
+	}
 }
 
 void Application::MoveActiveCamera(double x, double y) {
@@ -148,10 +143,6 @@ void Application::MoveActiveCamera(double x, double y) {
 void Application::MoveActiveCamera(Direction Adirection, float ADeltaTime) {
 	scenes[activeScene]->MoveActiveCamera(Adirection, ADeltaTime);
 }
-
-//float Application::GetDeltaTime() {
-//	return deltaTime;
-//}
 
 void Application::ToggleCursorLock() {
 	if (glfwGetInputMode(window, GLFW_CURSOR) == GLFW_CURSOR_DISABLED)

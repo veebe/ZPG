@@ -13,6 +13,7 @@
 #include "ModelSphere.h"
 
 #include"TransformationBuilder.h"
+#include"TransformationRandomizer.h"
 
 
 class Application {
@@ -26,7 +27,6 @@ public:
 	void MoveActiveCamera(double x, double y);
 	void MoveActiveCamera(Direction Adirection, float ADeltaTime);
 
-	//float GetDeltaTime();
 	void SetActiveSceneLastCursorPos(float x, float y);
 
     static Application& getInstance();

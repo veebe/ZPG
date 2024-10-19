@@ -13,7 +13,6 @@ void DrawableObject::InitMatrixes() {
 	this->shaderprogram->AddCamera(this->camera);
 	this->shaderprogram->OnCameraChangedView();
 	this->shaderprogram->OnCameraChangedProjection();
-	this->shaderprogram->ApplyTransformation(transformation->GetTransformationMatrix());
 }
 
 void DrawableObject::DrawObject() {

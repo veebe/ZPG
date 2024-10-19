@@ -7,7 +7,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include "Camera.h"
 
-class ShaderProgram : Observer {
+class ShaderProgram : IObserver {
 public:
 	ShaderProgram(const GLchar* AVertexShader, const GLchar* AFragmentShader);
 	void UseShader();

@@ -25,11 +25,3 @@ Transformation* TransformationComposite::Clone() const {
     }
     return clone;
 }
-
-TransformationRotate* TransformationComposite::GetLastTransformationRotate() {
-    for (auto& transformation : transformations) {
-        if (TransformationRotate* tr = dynamic_cast<TransformationRotate*>(transformation))
-            return tr;
-    }
-    return nullptr;
-}

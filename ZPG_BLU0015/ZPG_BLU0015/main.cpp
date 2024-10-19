@@ -1,14 +1,9 @@
-﻿
-
-#include "Application.h"
-
+﻿#include "Application.h"
 
 
 int main(void)
 {
-
 	Application& app = Application::getInstance();
-
 	app.Initialization();
 	app.CreateModels();
 	app.Run();
