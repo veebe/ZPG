@@ -68,6 +68,7 @@ void Application::Initialization() {
 
 	scenes.push_back(new Scene(window));
 	scenes.push_back(new Scene(window));
+	scenes.push_back(new Scene(window));
 
 	activeScene = 0;
 
@@ -102,23 +103,26 @@ void Application::CreateModels() {
 	ModelSuzi* modelSuzi = new ModelSuzi;
 	ModelSphere* modelSphere = new ModelSphere;
 
-	ShaderProgram* sp = new ShaderProgram(vertex_shader_color_transform, fragment_shader_normal);
-	ShaderProgram* sp2 = new ShaderProgram(vertex_shader_color_transform, fragment_shader_normal);
+	ShaderProgram* lambert1 = new ShaderProgram("ShaderLambert.vert", "ShaderLambert.frag");
+	ShaderProgram* lambert2 = new ShaderProgram("ShaderLambert.vert", "ShaderLambert.frag");
+	ShaderProgram* lambert3 = new ShaderProgram("ShaderLambert.vert", "ShaderLambert.frag");
 
 	TransformationBuilder builder;
 	TransformationBuilder builder2;
 	TransformationBuilder builder3;
 
-	TransformationComposite* sun_t = builder.ROTATE(0.f, 0.05f, 0.f, true)
+	scenes[0]->AddLight(new Light(glm::vec3(10.0, 10.0, 10.0), glm::vec3(1.0, 1.0, 1.0)));
+
+	TransformationComposite* sun_t = builder.ROTATE(0.f, 0.08f, 0.f, true)
 		.SCALE(4.f).Build();
-	scenes[0]->AddDrawableObject(modelSuzi, sp, sun_t);
+	scenes[0]->AddDrawableObject(modelSuzi, lambert1, sun_t);
 
 	TransformationComposite* earth_t = builder2.SCALE(1.f)
 		.ROTATE(0.f, 0.1f, 0.0f, true)
 		.TRANSLATE(15.f, -1.f, 15.f)
 		.ROTATE(0.f, 0.2f, 0.0f, true)
 		.Build();
-	scenes[0]->AddDrawableObject(modelSuzi, sp, earth_t);
+	scenes[0]->AddDrawableObject(modelSuzi, lambert1, earth_t);
 
 	TransformationComposite* moon_t = builder3.COMPONENT(earth_t)
 		.SCALE(0.5f)
@@ -126,14 +130,34 @@ void Application::CreateModels() {
 		.TRANSLATE(5.f, -1.f, 5.f)
 		.ROTATE(0.f, 0.2f, 0.f, true)
 		.Build();
-	scenes[0]->AddDrawableObject(modelSuzi, sp, moon_t);
+	scenes[0]->AddDrawableObject(modelSuzi, lambert1, moon_t);
 
+	scenes[1]->AddLight(new Light(glm::vec3(10.0, 10.0, 10.0), glm::vec3(0.1, 0.8, 1.0)));
 
 	for (int i = 0; i < 100; i++)
 	{
-		scenes[1]->AddDrawableObject(modelTree, sp2, TransformationRandomizer::CreateRandomTransformation());
-		scenes[1]->AddDrawableObject(modelBush, sp2, TransformationRandomizer::CreateRandomTransformation());
+		scenes[1]->AddDrawableObject(modelTree, lambert2, TransformationRandomizer::CreateRandomTransformation());
+		scenes[1]->AddDrawableObject(modelBush, lambert2, TransformationRandomizer::CreateRandomTransformation());
 	}
+
+	TransformationComposite* tc1 = new TransformationComposite();
+	tc1->AddTransformation(new TransformationTranslate(2,0,2));
+
+	TransformationComposite* tc2 = new TransformationComposite();
+	tc2->AddTransformation(new TransformationTranslate(2, 0, -2));
+
+	TransformationComposite* tc3 = new TransformationComposite();
+	tc3->AddTransformation(new TransformationTranslate(-2, 0, -2));
+
+	TransformationComposite* tc4 = new TransformationComposite();
+	tc4->AddTransformation(new TransformationTranslate(-2, 0, 2));
+
+	scenes[2]->AddDrawableObject(modelSphere, lambert3, tc1);
+	scenes[2]->AddDrawableObject(modelSphere, lambert3, tc2);
+	scenes[2]->AddDrawableObject(modelSphere, lambert3, tc3);
+	scenes[2]->AddDrawableObject(modelSphere, lambert3, tc4);
+
+	scenes[2]->AddLight(new Light(glm::vec3(0.0, 0.0, 0.0), glm::vec3(1.0, 1.0, 1.0)));
 }
 
 void Application::MoveActiveCamera(double x, double y) {

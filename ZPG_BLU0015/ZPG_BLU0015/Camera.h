@@ -29,6 +29,8 @@ public:
     
     void Attach(IObserver* Aobserver) override;
     void Detach(IObserver* Aobserver) override;
+
+    glm::vec3 GetCameraPosition();
 private:
 
     void Notify(NotifyType Atype) override; 

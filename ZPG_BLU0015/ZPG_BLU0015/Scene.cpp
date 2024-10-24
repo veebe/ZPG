@@ -7,6 +7,10 @@ Scene::Scene(GLFWwindow* window){
 
 void Scene::AddDrawableObject(Model* Amodel, ShaderProgram* ASP, TransformationComposite* ATransformation) {
 	drawableObjects.push_back(new DrawableObject(Amodel,ASP,ATransformation, this->camera));
+
+	if (this->light) {
+		ASP->AddLight(light);
+	}
 }
     
 void Scene::Draw() {
@@ -37,4 +41,12 @@ void Scene::MoveActiveCamera(double x, double y) {
 
 void Scene::MoveActiveCamera(Direction Adirection, float ADeltaTime) {
 	camera->MoveCameraWithArrows(Adirection, ADeltaTime);
+}
+
+void Scene::AddLight(Light* ALight) {
+	this->light = ALight;
+
+	for (auto doj : drawableObjects) {
+		doj->AddLight(this->light);
+	}
 }

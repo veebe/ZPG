@@ -23,3 +23,7 @@ void DrawableObject::DrawObject() {
 	
 	//this->shaderprogram->DeleteShader();
 };
+
+void DrawableObject::AddLight(Light* ALight) {
+	this->shaderprogram->AddLight(ALight);
+}

@@ -3,7 +3,9 @@
 
 enum NotifyType {
 	VIEWMATRIX,
-	PROJECTIONMATRIX
+	PROJECTIONMATRIX,
+	LIGHTPOS,
+	LIGHTCOLOR
 };
 
 class ISubject {

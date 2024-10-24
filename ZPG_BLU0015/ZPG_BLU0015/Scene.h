@@ -13,6 +13,7 @@
 #include "TransformationRotate.h"
 #include "TransformationScale.h"
 #include "TransformationTranslate.h"
+#include "Light.h"
 
 using namespace std;
 
@@ -31,11 +32,15 @@ public:
     void MoveActiveCamera(Direction Adirection, float ADeltaTime);
 
     void SetLastCursorPosition(float x, float y);
+
+    void AddLight(Light* ALight);
+    
     CurosrPos GetLastCursorPosition();
 private:
     GLFWwindow* window;
     vector<DrawableObject*> drawableObjects;
     Camera* camera;
+    Light* light;
 
     CurosrPos LastCursorPosition;
 };

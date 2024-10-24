@@ -18,6 +18,10 @@ glm::mat4 Camera::GetViewMatrix() {
 	return glm::lookAt(eye, eye + target, up);
 }
 
+glm::vec3 Camera::GetCameraPosition() {
+	return this->eye;
+}
+
 void Camera::MoveCameraWithMouse(double x, double y) {
 
 	if (this->firstMouse)
