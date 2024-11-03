@@ -11,7 +11,7 @@ public:
     TransformationBuilder& COMPONENT(TransformationComposite* component);
     TransformationBuilder& ROTATE(float x, float y, float z, bool Repeat = false);
     TransformationBuilder& SCALE(float scale);
-    TransformationBuilder& TRANSLATE(float x, float y, float z);
+    TransformationBuilder& TRANSLATE(float x, float y, float z, bool Repeat = false);
 
     TransformationComposite* Build();
 

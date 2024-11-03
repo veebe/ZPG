@@ -1,0 +1,14 @@
+#pragma once
+
+#include "DrawableObject.h"
+
+class DrawableLight : public DrawableObject {
+public:	
+	DrawableLight(Light* ALight, TransformationComposite* ATransformation);
+
+	void DrawObject() override;
+	void ApplyLight(Light* ALight) override;
+	void ApplyCamera(Camera* ACamera) override;
+private:
+	Light* light;
+};

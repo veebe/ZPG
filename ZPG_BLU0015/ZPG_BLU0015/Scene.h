@@ -9,6 +9,9 @@
 
 #include "ShaderProgram.h"
 #include "DrawableObject.h"
+#include "DrawableLight.h"
+#include "DrawableLightModel.h"
+#include "DrawableModel.h"
 #include "TransformationComposite.h"
 #include "TransformationRotate.h"
 #include "TransformationScale.h"
@@ -17,30 +20,27 @@
 
 using namespace std;
 
-struct CurosrPos {
-    float x;
-    float y;
-};
 
 class Scene {
 public:
     Scene(GLFWwindow* window);
-    void AddDrawableObject(Model* Amodel, ShaderProgram* ASP, TransformationComposite* ATransformation);
+    void AddDrawableModel(Model* Amodel, ShaderProgram* ASP, TransformationComposite* ATransformation = nullptr);
+    void AddDrawableLightModel(Model* Amodel, ShaderProgram* ASP, Light* ALight, TransformationComposite* ATransformation = nullptr);
+    void AddDrawableLight(Light* ALight, TransformationComposite* ATransformation = nullptr);
+
     void Draw();
 
     void MoveActiveCamera(double x, double y);
-    void MoveActiveCamera(Direction Adirection, float ADeltaTime);
+    void MoveActiveCamera(Direction Adirection, double ADeltaTime);
+    void ResizeWindow(int w, int h);
 
-    void SetLastCursorPosition(float x, float y);
-
-    void AddLight(Light* ALight);
-    
-    CurosrPos GetLastCursorPosition();
+    void ApplyCamera();
+    void ApplyLight();
 private:
+    TransformationComposite* GetTransformation(TransformationComposite* ATransformation);
+
     GLFWwindow* window;
     vector<DrawableObject*> drawableObjects;
     Camera* camera;
     Light* light;
-
-    CurosrPos LastCursorPosition;
 };

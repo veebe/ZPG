@@ -5,5 +5,5 @@
 class ModelSuzi : public Model {
 public:
 	ModelSuzi();
-	void DrawModel();
+	void DrawModel() override;
 };

@@ -5,5 +5,5 @@
 class ModelBush : public Model {
 public:
 	ModelBush();
-	void DrawModel();
+	void DrawModel() override;
 };

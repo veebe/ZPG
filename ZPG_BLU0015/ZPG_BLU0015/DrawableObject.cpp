@@ -1,29 +1,24 @@
 #include "DrawableObject.h"
 
-DrawableObject::DrawableObject(Model* Amodel, ShaderProgram* ASP, TransformationComposite* ATransformation, Camera* ACamera) {
+DrawableObject::DrawableObject(TransformationComposite* ATransformation): transformation(ATransformation) {};
+
+/*
+DrawableObject::DrawableObject(Model* Amodel, ShaderProgram* ASP, TransformationComposite* ATransformation) {
 	this->model = Amodel;
 	this->shaderprogram = ASP;
 	this->transformation = ATransformation;
-	this->camera = ACamera;
-
-	InitMatrixes();
 };
-
-void DrawableObject::InitMatrixes() {
-	this->shaderprogram->AddCamera(this->camera);
-	this->shaderprogram->OnCameraChangedView();
-	this->shaderprogram->OnCameraChangedProjection();
-}
 
 void DrawableObject::DrawObject() {
-
 	this->shaderprogram->UseShader();
-	this->shaderprogram->ApplyTransformation(transformation->GetTransformationMatrix());
+	this->shaderprogram->ApplyTransformation(this->transformation->GetTransformationMatrix());
 	this->model->DrawModel();
-	
-	//this->shaderprogram->DeleteShader();
 };
 
-void DrawableObject::AddLight(Light* ALight) {
+void DrawableObject::ApplyLight(Light* ALight) {
 	this->shaderprogram->AddLight(ALight);
 }
+
+void DrawableObject::ApplyCamera(Camera* ACamera) {
+	this->shaderprogram->AddCamera(ACamera);
+}*/

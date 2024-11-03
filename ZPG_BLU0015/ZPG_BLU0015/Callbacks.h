@@ -31,6 +31,5 @@ public:
 
 private:
 	GLFWwindow* window;
-	//Application* application;
 };
 

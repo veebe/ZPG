@@ -18,23 +18,22 @@ enum Direction {
     DOWN
 };
 
-class Camera : ISubject {
+class Camera : public ISubject {
 public:
     Camera();
 
     glm::mat4 GetViewMatrix();
     glm::mat4 GetProjectionMatrix();
-    void MoveCameraWithMouse(double x, double y);
+    void MoveCameraWithMouse(double xoffset, double yoffset);
     void MoveCameraWithArrows(Direction Adirection, float ADeltaTime);
-    
-    void Attach(IObserver* Aobserver) override;
-    void Detach(IObserver* Aobserver) override;
+
+    void ResizeWindow(int w, int h);
 
     glm::vec3 GetCameraPosition();
 private:
 
     void Notify(NotifyType Atype) override; 
-    std::vector<IObserver*> observers;
+    
 
     glm::vec3 target;
     glm::vec3 up;
@@ -43,8 +42,8 @@ private:
     float speed = 15.0f;
     float yaw = -90.0f;
     float pitch = 0.0f;
-    bool firstMouse = true;
-    float lastX = 0.0f;
-    float lastY = 0.0f;
+
+    int Width = 800.f;
+    int Height = 600.f;
 
 };

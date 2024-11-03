@@ -5,19 +5,28 @@ Scene::Scene(GLFWwindow* window){
 	this->camera = new Camera();
 }
 
-void Scene::AddDrawableObject(Model* Amodel, ShaderProgram* ASP, TransformationComposite* ATransformation) {
-	drawableObjects.push_back(new DrawableObject(Amodel,ASP,ATransformation, this->camera));
+void Scene::AddDrawableModel(Model* Amodel, ShaderProgram* ASP, TransformationComposite* ATransformation) {
+	
+	drawableObjects.push_back(new DrawableModel(Amodel, ASP, GetTransformation(ATransformation)));
+}
 
-	if (this->light) {
-		ASP->AddLight(light);
-	}
+void Scene::AddDrawableLightModel(Model* Amodel, ShaderProgram* ASP, Light* ALight, TransformationComposite* ATransformation) {
+	
+	this->light = ALight;
+	drawableObjects.push_back(new DrawableLightModel(Amodel, ASP, GetTransformation(ATransformation), ALight));
+}
+
+void Scene::AddDrawableLight(Light* ALight, TransformationComposite* ATransformation) {
+
+	this->light = ALight;
+	drawableObjects.push_back(new DrawableLight(ALight, GetTransformation(ATransformation)));
 }
     
 void Scene::Draw() {
 	
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	for (DrawableObject* dro : drawableObjects)
+	for (auto* dro : drawableObjects)
 	{
 		dro->DrawObject();
 	}
@@ -26,27 +35,32 @@ void Scene::Draw() {
 
 };
 
-void Scene::SetLastCursorPosition(float x, float y) {
-	this->LastCursorPosition.x = x;
-	this->LastCursorPosition.y = y;
-}
-
-CurosrPos Scene::GetLastCursorPosition() {
-	return LastCursorPosition;
-}
-
 void Scene::MoveActiveCamera(double x, double y) {
 	camera->MoveCameraWithMouse(x, y);
 }
 
-void Scene::MoveActiveCamera(Direction Adirection, float ADeltaTime) {
+void Scene::MoveActiveCamera(Direction Adirection, double ADeltaTime) {
 	camera->MoveCameraWithArrows(Adirection, ADeltaTime);
 }
 
-void Scene::AddLight(Light* ALight) {
-	this->light = ALight;
+TransformationComposite* Scene::GetTransformation(TransformationComposite* ATransformation) {
+	if (ATransformation)
+		return ATransformation;
+	return new TransformationComposite();
+}
 
+void Scene::ResizeWindow(int w, int h) {
+	this->camera->ResizeWindow(w, h);
+}
+
+void Scene::ApplyCamera() {
 	for (auto doj : drawableObjects) {
-		doj->AddLight(this->light);
+		doj->ApplyCamera(this->camera);
+	}
+}
+
+void Scene::ApplyLight() {
+	for (auto doj : drawableObjects) {
+		doj->ApplyLight(this->light);
 	}
 }

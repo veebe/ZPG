@@ -22,7 +22,6 @@ void Model::DrawModel() {
 
 void Model::BindVAO(GLuint AVBO) {
 	//Vertex Array Object (VAO)
-	VAO = 0;
 	glGenVertexArrays(1, &VAO); //generate the VAO
 	glBindVertexArray(VAO); //bind the VAO
 	glBindBuffer(GL_ARRAY_BUFFER, AVBO);

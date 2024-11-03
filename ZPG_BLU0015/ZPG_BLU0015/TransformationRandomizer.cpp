@@ -11,16 +11,16 @@ TransformationComposite* TransformationRandomizer::CreateRandomTransformation() 
     TransformationComposite* transformation = new TransformationComposite();
 
     float randomScale =  RandomFloat(0.5f, 3.f);
-    float randomRotationX = RandomFloat(-1.f, 1.f);
+    float randomRotationX = RandomFloat(-7.f, 7.f);
     float randomRotationY = RandomFloat(0.f, 360.f);
-    float randomRotationZ = 0; //RandomFloat(-1.f, 1.f);
-    float randomTranslateX = RandomFloat(-25.f, 25.f);
+    float randomRotationZ = RandomFloat(-7.f, 7.f);
+    float randomTranslateX = RandomFloat(-50.f, 50.f);
     float randomTranslateY = 0;
-    float randomTranslateZ = RandomFloat(-25.f, 25.f);
+    float randomTranslateZ = RandomFloat(-50.f, 50.f);
 
+    transformation->AddTransformation(new TransformationTranslate(randomTranslateX, randomTranslateY, randomTranslateZ));
     transformation->AddTransformation(new TransformationScale(randomScale));
     transformation->AddTransformation(new TransformationRotate(randomRotationX, randomRotationY, randomRotationZ));
-    transformation->AddTransformation(new TransformationTranslate(randomTranslateX, randomTranslateY, randomTranslateZ));
 
     return transformation;
 }

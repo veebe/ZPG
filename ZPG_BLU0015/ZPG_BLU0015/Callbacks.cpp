@@ -74,14 +74,18 @@ void Callbacks::window_iconify_callback(GLFWwindow* window, int iconified) { pri
 void Callbacks::window_size_callback(GLFWwindow* window, int width, int height) {
 	printf("resize %d, %d \n", width, height);
 	glViewport(0, 0, width, height);
+
+	Application::getInstance().ResizeWindow(width,height);
 }
 
 void Callbacks::cursor_callback(GLFWwindow* window, double x, double y) { 
-	Application::getInstance().MoveActiveCamera(x, y);
-	Application::getInstance().SetActiveSceneLastCursorPos(x, y);
+	Application::getInstance().MoveActiveCameraMouse(x, y);
 }
 
 void Callbacks::button_callback(GLFWwindow* window, int button, int action, int mode) {
 	printf("button_callback [%d,%d,%d]\n", button, action, mode);
+	if (button == 1) {
+		Application::getInstance().SetMouseButtonDown((action == 1) ? true : false);
+	}
 		
 }

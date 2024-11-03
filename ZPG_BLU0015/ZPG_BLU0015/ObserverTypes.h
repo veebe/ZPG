@@ -1,0 +1,9 @@
+#pragma once
+
+enum NotifyType {
+	VIEWMATRIX,
+	PROJECTIONMATRIX,
+	LIGHTPOS,
+	LIGHTCOLOR,
+	MATERIAL
+};

@@ -10,13 +10,11 @@
 
 class DrawableObject {
 public:
-	DrawableObject(Model* Amodel, ShaderProgram* ASP, TransformationComposite* ATransformation, Camera* ACamera);
-	void DrawObject();
-	void InitMatrixes();
-	void AddLight(Light* ALight);
-private:
-	Model* model;
-	ShaderProgram* shaderprogram;
+	DrawableObject(TransformationComposite* ATransformation);
+
+	virtual void DrawObject() = 0;
+	virtual void ApplyLight(Light* ALight) = 0;
+	virtual void ApplyCamera(Camera* ACamera) = 0;
+protected:
 	TransformationComposite* transformation;
-	Camera* camera;
 };

@@ -1,9 +1,14 @@
 #include "Application.h"
 
+#include "OtherModels.h"
+
 void Application::Run() {
+	scenes[activeScene]->ApplyCamera();
+	scenes[activeScene]->ApplyLight();
+
 	glEnable(GL_DEPTH_TEST);
 	while (!glfwWindowShouldClose(window)) {
-		float currentTime = glfwGetTime();
+		double currentTime = glfwGetTime();
 		deltaTime = currentTime - lastTime;
 		lastTime = currentTime;
 
@@ -22,13 +27,9 @@ void Application::NextScene() {
 	else
 		activeScene++;
 
-	glfwSetCursorPos(this->window, scenes[activeScene]->GetLastCursorPosition().x, scenes[activeScene]->GetLastCursorPosition().y);
+	scenes[activeScene]->ApplyCamera();
+	scenes[activeScene]->ApplyLight();
 }
-
-void Application::SetActiveSceneLastCursorPos(float x, float y) {
-	scenes[activeScene]->SetLastCursorPosition(x, y);
-}
-
 
 void Application::ProcessInput(GLFWwindow* window)
 {
@@ -69,8 +70,7 @@ void Application::Initialization() {
 	scenes.push_back(new Scene(window));
 	scenes.push_back(new Scene(window));
 	scenes.push_back(new Scene(window));
-
-	activeScene = 0;
+	scenes.push_back(new Scene(window));
 
 	callbacks = new Callbacks(window);
 
@@ -98,73 +98,139 @@ void Application::Initialization() {
 
 void Application::CreateModels() {
 
+	////---------------------------------------------------------------------------------------////
+	////                                     common models                                     ////
+
 	ModelTree* modelTree = new ModelTree;
 	ModelBush* modelBush = new ModelBush;
 	ModelSuzi* modelSuzi = new ModelSuzi;
 	ModelSphere* modelSphere = new ModelSphere;
+	Model* modelPlane = new Model(plane);
+	Model* modelTriangle = new Model(triangle);
 
-	ShaderProgram* lambert1 = new ShaderProgram("ShaderLambert.vert", "ShaderLambert.frag");
-	ShaderProgram* lambert2 = new ShaderProgram("ShaderLambert.vert", "ShaderLambert.frag");
-	ShaderProgram* lambert3 = new ShaderProgram("ShaderLambert.vert", "ShaderLambert.frag");
+	Material* Blue = new Material(glm::vec3(0.1f, 0.1f, 0.8f), glm::vec3(0.1f, 0.1f, 0.2f), 32);
+	Material* Red = new Material(glm::vec3(0.8f, 0.1f, 0.1f), glm::vec3(0.2f, 0.1f, 0.1f), 16);
+	Material* Green = new Material(glm::vec3(0.1f, 0.6f, 0.1f), glm::vec3(0.1f, 0.2f, 0.1f), 8);
+	Material* White = new Material(glm::vec3(1.f, 1.f, 1.f), glm::vec3(1.f, 1.f, 1.f), 32);
 
-	TransformationBuilder builder;
-	TransformationBuilder builder2;
-	TransformationBuilder builder3;
+	TransformationBuilder transformationBuilder;
+	ShaderProgramBuilder shaderProgramBuilder;
 
-	scenes[0]->AddLight(new Light(glm::vec3(10.0, 10.0, 10.0), glm::vec3(1.0, 1.0, 1.0)));
+	ShaderProgram* constantWhite = shaderProgramBuilder.CREATE(CONSTANT, White).Build();
+	ShaderProgram* lambert = shaderProgramBuilder.CREATE(LAMBERT).Build();
+	ShaderProgram* phong = shaderProgramBuilder.CREATE(PHONG).Build();
+	ShaderProgram* blinn = shaderProgramBuilder.CREATE(BLINN).Build();
 
-	TransformationComposite* sun_t = builder.ROTATE(0.f, 0.08f, 0.f, true)
-		.SCALE(4.f).Build();
-	scenes[0]->AddDrawableObject(modelSuzi, lambert1, sun_t);
+	ShaderProgram* blinnGreen = shaderProgramBuilder.CREATE(BLINN, Green).Build();
+	ShaderProgram* lambertRed = shaderProgramBuilder.CREATE(LAMBERT, Red).Build();
+	ShaderProgram* constantBlue = shaderProgramBuilder.CREATE(CONSTANT, Blue).Build();
 
-	TransformationComposite* earth_t = builder2.SCALE(1.f)
-		.ROTATE(0.f, 0.1f, 0.0f, true)
-		.TRANSLATE(15.f, -1.f, 15.f)
+	Light* whiteLight = new Light(glm::vec3(1.0, 1.0, 1.0));
+
+	////---------------------------------------------------------------------------------------////
+	////                               monkey solar system                                     ////
+
+	TransformationComposite* lightTrans = transformationBuilder.SCALE(0.5f).ROTATE(1, 1, 1, true).TRANSLATE(15,2,0).Build();
+
+	scenes[0]->AddDrawableLightModel(modelSphere,constantWhite, whiteLight, lightTrans);
+
+	TransformationComposite* sun_t = transformationBuilder
+		//.TRANSLATE(0, 0, 0.01, true)
+		.ROTATE(0.03f, 0.08f, 0.05f, true)
+		.SCALE(4.f)
+		.Build();
+	scenes[0]->AddDrawableModel(modelSuzi, lambertRed, sun_t);
+
+	TransformationComposite* earth_t = transformationBuilder
+		//.TRANSLATE(0, 0, 0.01, true)
+		.ROTATE(0.f, 0.1f, .03f, true)
+		.TRANSLATE(20.f, 0.f, 0.f)
 		.ROTATE(0.f, 0.2f, 0.0f, true)
 		.Build();
-	scenes[0]->AddDrawableObject(modelSuzi, lambert1, earth_t);
+	scenes[0]->AddDrawableModel(modelSuzi, phong, earth_t);
 
-	TransformationComposite* moon_t = builder3.COMPONENT(earth_t)
+	TransformationComposite* moon_t = transformationBuilder
+		.COMPONENT(earth_t)
 		.SCALE(0.5f)
 		.ROTATE(0.f, 0.1f, 0.f, true)
 		.TRANSLATE(5.f, -1.f, 5.f)
 		.ROTATE(0.f, 0.2f, 0.f, true)
 		.Build();
-	scenes[0]->AddDrawableObject(modelSuzi, lambert1, moon_t);
+	scenes[0]->AddDrawableModel(modelSuzi, blinn, moon_t);
 
-	scenes[1]->AddLight(new Light(glm::vec3(10.0, 10.0, 10.0), glm::vec3(0.1, 0.8, 1.0)));
+	TransformationComposite* moon_of_moon_t = transformationBuilder
+		.COMPONENT(moon_t)
+		.SCALE(0.5f)
+		.ROTATE(0.3f, 0.0f, 0.3f, true)
+		.TRANSLATE(3.f, -1.f, 3.f)
+		.ROTATE(0.f, 0.0f, 0.9f, true)
+		.Build();
+	scenes[0]->AddDrawableModel(modelSuzi, constantBlue, moon_of_moon_t);
+
+	////---------------------------------------------------------------------------------------////
+	////                                       forest                                          ////
 
 	for (int i = 0; i < 100; i++)
 	{
-		scenes[1]->AddDrawableObject(modelTree, lambert2, TransformationRandomizer::CreateRandomTransformation());
-		scenes[1]->AddDrawableObject(modelBush, lambert2, TransformationRandomizer::CreateRandomTransformation());
+		scenes[1]->AddDrawableModel(modelTree, phong, TransformationRandomizer::CreateRandomTransformation());
+		scenes[1]->AddDrawableModel(modelBush, blinnGreen, TransformationRandomizer::CreateRandomTransformation());
 	}
 
-	TransformationComposite* tc1 = new TransformationComposite();
-	tc1->AddTransformation(new TransformationTranslate(2,0,2));
+	TransformationComposite* planeTransformation = transformationBuilder.SCALE(60).Build();
 
-	TransformationComposite* tc2 = new TransformationComposite();
-	tc2->AddTransformation(new TransformationTranslate(2, 0, -2));
+	scenes[1]->AddDrawableModel(modelPlane, lambert, planeTransformation);
 
-	TransformationComposite* tc3 = new TransformationComposite();
-	tc3->AddTransformation(new TransformationTranslate(-2, 0, -2));
+	TransformationComposite* lightTransformation = transformationBuilder.ROTATE(0,1,0, true).TRANSLATE(20,20,0).Build();
 
-	TransformationComposite* tc4 = new TransformationComposite();
-	tc4->AddTransformation(new TransformationTranslate(-2, 0, 2));
+	scenes[1]->AddDrawableLightModel(modelSuzi, constantWhite, whiteLight, lightTransformation);
 
-	scenes[2]->AddDrawableObject(modelSphere, lambert3, tc1);
-	scenes[2]->AddDrawableObject(modelSphere, lambert3, tc2);
-	scenes[2]->AddDrawableObject(modelSphere, lambert3, tc3);
-	scenes[2]->AddDrawableObject(modelSphere, lambert3, tc4);
 
-	scenes[2]->AddLight(new Light(glm::vec3(0.0, 0.0, 0.0), glm::vec3(1.0, 1.0, 1.0)));
+	////---------------------------------------------------------------------------------------////
+	////                                       spheres                                         ////
+
+	TransformationComposite* tc1 = transformationBuilder.TRANSLATE(2, 0, 2).Build();
+	TransformationComposite* tc2 = transformationBuilder.TRANSLATE(2, 0, -2).Build();
+	TransformationComposite* tc3 = transformationBuilder.TRANSLATE(-2, 0, -2).Build();
+	TransformationComposite* tc4 = transformationBuilder.TRANSLATE(-2, 0, 2).Build();
+
+	scenes[2]->AddDrawableModel(modelSphere, phong, tc1);
+	scenes[2]->AddDrawableModel(modelSphere, phong, tc2);
+	scenes[2]->AddDrawableModel(modelSphere, phong, tc3);
+	scenes[2]->AddDrawableModel(modelSphere, phong, tc4);
+
+	TransformationComposite* tclight = transformationBuilder.SCALE(0.1f).Build();
+
+	//scenes[2]->AddDrawableLightModel(modelSphere, constantWhite, whiteLight, tclight);
+	scenes[2]->AddDrawableLight(whiteLight, tclight);
+
+	////---------------------------------------------------------------------------------------////
+	////                                      triangle                                         ////
+
+	ShaderProgram* constantTriangle = shaderProgramBuilder.CREATE(CONSTANT).Build();
+
+	scenes[3]->AddDrawableModel(modelTriangle, constantBlue);
+
 }
 
-void Application::MoveActiveCamera(double x, double y) {
-	scenes[activeScene]->MoveActiveCamera(x, y);
+void Application::MoveActiveCameraMouse(double x, double y) {
+	if (MouseButtonDown || glfwGetInputMode(window, GLFW_CURSOR) == GLFW_CURSOR_DISABLED) {
+		if (this->firstMouse)
+		{
+			this->lastX = x;
+			this->lastY = y;
+			this->firstMouse = false;
+		}
+		double xoffset = x - this->lastX;
+		double yoffset = this->lastY - y;
+		this->lastX = x;
+		this->lastY = y;
+		scenes[activeScene]->MoveActiveCamera(xoffset, yoffset);
+	}
+	else
+		this->firstMouse = true;
 }
 
-void Application::MoveActiveCamera(Direction Adirection, float ADeltaTime) {
+void Application::MoveActiveCamera(Direction Adirection, double ADeltaTime) {
 	scenes[activeScene]->MoveActiveCamera(Adirection, ADeltaTime);
 }
 
@@ -175,8 +241,19 @@ void Application::ToggleCursorLock() {
 		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 }
 
+void Application::SetMouseButtonDown(bool ADown) {
+	this->MouseButtonDown = ADown;
+}
+
 Application& Application::getInstance()
 {
 	static Application app;
 	return app;
+}
+
+void Application::ResizeWindow(int w, int h) {
+	for (auto s : scenes)
+	{
+		s->ResizeWindow(w, h);
+	}
 }

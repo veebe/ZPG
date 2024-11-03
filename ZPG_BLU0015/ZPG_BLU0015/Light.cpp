@@ -7,6 +7,22 @@ Light::Light(glm::vec3 APosition, glm::vec3 AColor) {
 	Notify(LIGHTPOS);
 	Notify(LIGHTCOLOR);
 }
+
+Light::Light(glm::vec3 AColor) {
+	this->Color = AColor;
+	this->Position = glm::vec3(0, 0, 0);
+}
+
+void Light::SetLightPostion(glm::vec3 APosition) {
+	this->Position = APosition;
+	Notify(LIGHTPOS);
+}
+
+void Light::SetLightColor(glm::vec3 AColor) {
+	this->Color = AColor;
+	Notify(LIGHTCOLOR);
+}
+
 glm::vec3 Light::GetLightPosition() {
 	return this->Position;
 }
@@ -14,27 +30,8 @@ glm::vec3 Light::GetLightColor() {
 	return this->Color;
 }
 
-void Light::Attach(IObserver* Aobserver) {
-	observers.push_back(Aobserver);
-}
-
-void Light::Detach(IObserver* Aobserver) {
-	observers.erase(std::remove(observers.begin(), observers.end(), Aobserver), observers.end());
-}
-
 void Light::Notify(NotifyType Atype) {
-	switch (Atype) {
-	case LIGHTPOS:
-		for (auto observer : observers) {
-			observer->OnLightChangePosition();
-		}
-		break;
-	case LIGHTCOLOR:
-		for (auto observer : observers) {
-			observer->OnLightChangeColor();
-		}
-		break;
-	default:
-		break;
+	for (auto observer : observers) {
+		observer->OnUpdate(Atype);
 	}
 }

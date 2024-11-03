@@ -5,5 +5,5 @@
 class ModelSphere : public Model {
 public:
 	ModelSphere();
-	void DrawModel();
+	void DrawModel() override;
 };

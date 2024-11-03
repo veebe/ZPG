@@ -1,7 +1,7 @@
 #include "Camera.h"
 
 Camera::Camera() {
-	this->eye = glm::vec3(0.0f, 0.0f, 10.0f);
+	this->eye = glm::vec3(0.0f, 1.0f, 10.0f);
 	this->target = glm::vec3(0.0f, 0.0f, -1.0f);
 	this->up = glm::vec3(0.0f, 1.0f, 0.0f);
 
@@ -10,7 +10,7 @@ Camera::Camera() {
 }
 
 glm::mat4 Camera::GetProjectionMatrix() {
-	return glm::perspective(glm::radians(60.f), 4.0f / 3.0f, 0.1f, 100.0f);
+	return glm::perspective(glm::radians(60.f), float(Width / Height), 0.1f, 100.0f);
 	
 }
 
@@ -22,18 +22,13 @@ glm::vec3 Camera::GetCameraPosition() {
 	return this->eye;
 }
 
-void Camera::MoveCameraWithMouse(double x, double y) {
+void Camera::ResizeWindow(int w, int h) {
+	this->Width = w;
+	this->Height = h;
+	Notify(PROJECTIONMATRIX);
+}
 
-	if (this->firstMouse)
-	{
-		this->lastX = x;
-		this->lastY = y;
-		this->firstMouse = false;
-	}
-	float xoffset = x - this->lastX;
-	float yoffset = this->lastY - y;
-	this->lastX = x;
-	this->lastY = y;
+void Camera::MoveCameraWithMouse(double xoffset, double yoffset) {
 
 	float sensitivity;
 	if (abs(xoffset) < 1.5)
@@ -93,27 +88,8 @@ void Camera::MoveCameraWithArrows(Direction Adirection, float ADeltaTime) {
 	Notify(VIEWMATRIX);
 }
 
-void Camera::Attach(IObserver* Aobserver) {
-	observers.push_back(Aobserver);
-}
-
-void Camera::Detach(IObserver* Aobserver) {
-	observers.erase(std::remove(observers.begin(), observers.end(), Aobserver), observers.end());
-}
-
 void Camera::Notify(NotifyType Atype) {
-	switch (Atype) {
-	case VIEWMATRIX:
-		for (auto observer : observers) {
-			observer->OnCameraChangedView();
-		}
-		break;
-	case PROJECTIONMATRIX:
-		for (auto observer : observers) {
-			observer->OnCameraChangedProjection();
-		}
-		break;
-	default:
-		break;
+	for (auto observer : observers) {
+		observer->OnUpdate(Atype);
 	}
 }

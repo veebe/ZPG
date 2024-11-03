@@ -19,11 +19,13 @@ TransformationBuilder& TransformationBuilder::SCALE(float scale) {
     return *this;
 }
 
-TransformationBuilder& TransformationBuilder::TRANSLATE(float x, float y, float z) {
-    composite->AddTransformation(new TransformationTranslate(x, y, z));
+TransformationBuilder& TransformationBuilder::TRANSLATE(float x, float y, float z, bool Repeat) {
+    composite->AddTransformation(new TransformationTranslate(x, y, z, Repeat));
     return *this;
 }
 
 TransformationComposite* TransformationBuilder::Build() {
-    return composite;
+    TransformationComposite* result = static_cast<TransformationComposite*>(composite->Clone());
+    composite = new TransformationComposite();
+    return result;
 }

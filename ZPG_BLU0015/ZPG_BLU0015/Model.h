@@ -12,5 +12,5 @@ private:
 	std::vector<float> model;
 protected:
 	void BindVAO(GLuint AVBO);
-	GLuint VAO;
+	GLuint VAO = 0;
 };

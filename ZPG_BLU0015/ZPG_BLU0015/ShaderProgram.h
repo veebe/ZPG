@@ -8,8 +8,9 @@
 #include "Camera.h"
 #include "ShaderLoader.h"
 #include "Light.h"
+#include "Material.h"
 
-class ShaderProgram : IObserver, ShaderLoader {
+class ShaderProgram : IObserver,public ShaderLoader {
 public:
 	ShaderProgram(const GLchar* AVertexShader, const GLchar* AFragmentShader, bool AisFile = true);
 
@@ -17,18 +18,23 @@ public:
 	void DeleteShader();
 
 	void ApplyTransformation(glm::mat4 M);
+	void ApplyMaterial(Material * AMaterial);
 	
-	void OnCameraChangedProjection() override;
-	void OnCameraChangedView() override;
-	void OnLightChangePosition() override;
-	void OnLightChangeColor() override;
+	void OnCameraChangedProjection();
+	void OnCameraChangedView();
+	void OnLightChangePosition();
+	void OnLightChangeColor();
+	void OnMaterialChange();
+
+	void OnUpdate(NotifyType ANotifyType) override;
 
 	void AddCamera(Camera* ACamera);
 	void AddLight(Light* ALight);
+	void AddMaterial(Material* AMaterial);
 private:
 	Camera* camera;
 	Light* light;
-	GLuint SPID;
+	Material* material;
 	void CheckShader();
 
 };

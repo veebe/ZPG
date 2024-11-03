@@ -4,19 +4,20 @@
 #include "IObserver.h"
 #include "vector"
 
-class Light : ISubject {
+class Light : public ISubject {
 public:
 	Light(glm::vec3 APosition, glm::vec3 AColor);
+	Light(glm::vec3 AColor);
+
 	glm::vec3 GetLightPosition();
 	glm::vec3 GetLightColor();
 
-	void Attach(IObserver* Aobserver) override;
-	void Detach(IObserver* Aobserver) override;
+	void SetLightPostion(glm::vec3 APosition);
+	void SetLightColor(glm::vec3 AColor);
 
 private:
 	void Notify(NotifyType Atype) override;
 
 	glm::vec3 Position;
 	glm::vec3 Color;
-	std::vector<IObserver*> observers;
 };

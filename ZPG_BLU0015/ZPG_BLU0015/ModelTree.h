@@ -5,5 +5,5 @@
 class ModelTree : public Model {
 public:
 	ModelTree();
-	void DrawModel();
+	void DrawModel() override;
 };

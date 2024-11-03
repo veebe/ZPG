@@ -1,9 +1,7 @@
 #pragma once
+#include "ObserverTypes.h"
+
 class IObserver {
 public:
-    virtual void OnCameraChangedProjection() = 0;
-    virtual void OnCameraChangedView() = 0;
-
-    virtual void OnLightChangePosition() = 0;
-    virtual void OnLightChangeColor() = 0;
+    virtual void OnUpdate(NotifyType ANotifyType) = 0;
 };

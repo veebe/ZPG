@@ -1,16 +1,14 @@
 #pragma once
 #include "IObserver.h"
+#include "ObserverTypes.h"
 
-enum NotifyType {
-	VIEWMATRIX,
-	PROJECTIONMATRIX,
-	LIGHTPOS,
-	LIGHTCOLOR
-};
+#include "vector"
 
 class ISubject {
 public:
-	virtual void Attach(IObserver* observer) = 0;
-	virtual void Detach(IObserver* observer) = 0;
+	virtual void Attach(IObserver* observer);
+	virtual void Detach(IObserver* observer);
+protected:
 	virtual void Notify(NotifyType Atype) = 0;
+	std::vector<IObserver*> observers;
 };

@@ -11,27 +11,27 @@ ShaderProgram::ShaderProgram(const GLchar* AVertexShader, const GLchar* AFragmen
 		glShaderSource(fragmentShader, 1, &AFragmentShader, NULL);
 		glCompileShader(fragmentShader);
 
-		SPID = glCreateProgram();
-		glAttachShader(SPID, fragmentShader);
-		glAttachShader(SPID, vertexShader);
-		glLinkProgram(SPID);
+		shaderProgramID = glCreateProgram();
+		glAttachShader(shaderProgramID, fragmentShader);
+		glAttachShader(shaderProgramID, vertexShader);
+		glLinkProgram(shaderProgramID);
 
 		CheckShader();
 	}
 	else {
-		ShaderLoader(AVertexShader, AFragmentShader, &SPID);
+		loadShader(AVertexShader, AFragmentShader);
 	}
 }
 
 void ShaderProgram::CheckShader() {
 	GLint status;
-	glGetProgramiv(SPID, GL_LINK_STATUS, &status);
+	glGetProgramiv(shaderProgramID, GL_LINK_STATUS, &status);
 	if (status == GL_FALSE)
 	{
 		GLint infoLogLength;
-		glGetProgramiv(SPID, GL_INFO_LOG_LENGTH, &infoLogLength);
+		glGetProgramiv(shaderProgramID, GL_INFO_LOG_LENGTH, &infoLogLength);
 		GLchar* strInfoLog = new GLchar[infoLogLength + 1];
-		glGetProgramInfoLog(SPID, infoLogLength, NULL, strInfoLog);
+		glGetProgramInfoLog(shaderProgramID, infoLogLength, NULL, strInfoLog);
 		fprintf(stderr, "Linker failure: %s\n", strInfoLog);
 		delete[] strInfoLog;
 		exit(EXIT_FAILURE);
@@ -41,58 +41,123 @@ void ShaderProgram::CheckShader() {
 void ShaderProgram::AddCamera(Camera* ACamera) {
 	this->camera = ACamera;
 	this->camera->Attach(this);
+	OnCameraChangedProjection();
+	OnCameraChangedView();
 }
 
 void ShaderProgram::AddLight(Light* ALight) {
 	this->light = ALight;
-	this->light->Attach(this);
+	if (this->light) {
+		this->light->Attach(this);
+	}
 	OnLightChangePosition();
 	OnLightChangeColor();
+	
+}
+
+void ShaderProgram::AddMaterial(Material* AMaterial) {
+	this->material = AMaterial;
+	this->material->Attach(this);
+	OnMaterialChange();
 }
 
 
 void ShaderProgram::UseShader(){
-	glUseProgram(SPID);
+	glUseProgram(shaderProgramID);
 }
 
 void ShaderProgram::DeleteShader() {
-	glDeleteProgram(SPID);
+	ShaderLoader::deleteShader();
+}
+
+void ShaderProgram::ApplyMaterial(Material* AMaterial) {
+	GLuint idObjectColor = glGetUniformLocation(this->shaderProgramID, "objectColor");
+	if (idObjectColor == -1)
+		exit;
+	glProgramUniform3fv(this->shaderProgramID, idObjectColor, 1, glm::value_ptr(AMaterial->GetObjectColor()));
+
+	GLuint idAmbient = glGetUniformLocation(this->shaderProgramID, "ambient");
+	if (idAmbient == -1)
+		exit;
+	glProgramUniform3fv(this->shaderProgramID, idAmbient, 1, glm::value_ptr(AMaterial->GetAmbientColor()));
+
+	GLuint idShininess = glGetUniformLocation(this->shaderProgramID, "shininess");
+	if (idShininess == -1)
+		exit;
+	glProgramUniform1f(this->shaderProgramID, idShininess, AMaterial->GetShininess());
 }
 
 void ShaderProgram::ApplyTransformation(glm::mat4 M) {
-	GLint idModelTransform = glGetUniformLocation(SPID, "modelMatrix");
+	GLint idModelTransform = glGetUniformLocation(shaderProgramID, "modelMatrix");
+	if (idModelTransform == -1)
+		exit;
 	glUniformMatrix4fv(idModelTransform, 1, GL_FALSE, &M[0][0]);
 
-	GLint idCameraPosition = glGetUniformLocation(SPID, "cameraPosition");
+	GLint idCameraPosition = glGetUniformLocation(shaderProgramID, "cameraPosition");
+	if (idCameraPosition == -1)
+		exit;
 	glUniformMatrix4fv(idCameraPosition, 1, GL_FALSE, glm::value_ptr(camera->GetCameraPosition()));
 }
 
 void ShaderProgram::OnCameraChangedView()
 {
-	GLuint idModelTransform = glGetUniformLocation(this->SPID, "viewMatrix");
+	GLuint idModelTransform = glGetUniformLocation(this->shaderProgramID, "viewMatrix");
 	if (idModelTransform == -1)
 		exit;
-	glProgramUniformMatrix4fv(this->SPID, idModelTransform, 1, GL_FALSE, glm::value_ptr(camera->GetViewMatrix()));
+	glProgramUniformMatrix4fv(this->shaderProgramID, idModelTransform, 1, GL_FALSE, glm::value_ptr(camera->GetViewMatrix()));
 }
 
 void ShaderProgram::OnCameraChangedProjection()
 {
-	GLuint idModelTransform = glGetUniformLocation(this->SPID, "projectionMatrix");
+	GLuint idModelTransform = glGetUniformLocation(this->shaderProgramID, "projectionMatrix");
 	if (idModelTransform == -1)
 		exit;
-	glProgramUniformMatrix4fv(this->SPID, idModelTransform, 1, GL_FALSE, glm::value_ptr(camera->GetProjectionMatrix()));
+	glProgramUniformMatrix4fv(this->shaderProgramID, idModelTransform, 1, GL_FALSE, glm::value_ptr(camera->GetProjectionMatrix()));
 }
 
 void ShaderProgram::OnLightChangePosition() {
-	GLuint idLightPosition = glGetUniformLocation(this->SPID, "lightPosition");
+	GLuint idLightPosition = glGetUniformLocation(this->shaderProgramID, "lightPosition");
 	if (idLightPosition == -1)
 		exit;
-	glProgramUniform3fv(this->SPID, idLightPosition, 1, glm::value_ptr(light->GetLightPosition()));
+	if(this->light)
+		glProgramUniform3fv(this->shaderProgramID, idLightPosition, 1, glm::value_ptr(light->GetLightPosition()));
+	else
+		glProgramUniform3fv(this->shaderProgramID, idLightPosition, 1, glm::value_ptr(glm::vec3(0,0,0)));
 }
 
 void ShaderProgram::OnLightChangeColor() {
-	GLuint idLightPosition = glGetUniformLocation(this->SPID, "lightColor");
+	GLuint idLightPosition = glGetUniformLocation(this->shaderProgramID, "lightColor");
 	if (idLightPosition == -1)
 		exit;
-	glProgramUniform3fv(this->SPID, idLightPosition, 1, glm::value_ptr(light->GetLightColor()));
+	if (this->light)
+		glProgramUniform3fv(this->shaderProgramID, idLightPosition, 1, glm::value_ptr(light->GetLightColor()));
+	else
+		glProgramUniform3fv(this->shaderProgramID, idLightPosition, 1, glm::value_ptr(glm::vec3(0,0,0)));
+
+}
+
+void ShaderProgram::OnMaterialChange() {
+	ApplyMaterial(this->material);
+}
+
+void ShaderProgram::OnUpdate(NotifyType ANotifyType) {
+	switch (ANotifyType) {
+	case VIEWMATRIX:
+		OnCameraChangedView();
+		break;
+	case PROJECTIONMATRIX:
+		OnCameraChangedProjection();
+		break;
+	case LIGHTPOS:
+		OnLightChangePosition();
+		break;
+	case LIGHTCOLOR:
+		OnLightChangeColor();
+		break;
+	case MATERIAL:
+		OnMaterialChange();
+		break;
+	default:
+		break;
+	}
 }
