@@ -12,6 +12,9 @@ void Application::Run() {
 		deltaTime = currentTime - lastTime;
 		lastTime = currentTime;
 
+		//float fps = CalculateFPS();
+		//printf("FPS: %f\n", fps);
+
 		ProcessInput(this->window);
 
 		scenes[activeScene]->Draw();
@@ -27,6 +30,7 @@ void Application::NextScene() {
 	else
 		activeScene++;
 
+	scenes[activeScene]->ClearLight();
 	scenes[activeScene]->ApplyCamera();
 	scenes[activeScene]->ApplyLight();
 }
@@ -71,6 +75,7 @@ void Application::Initialization() {
 	scenes.push_back(new Scene(window));
 	scenes.push_back(new Scene(window));
 	scenes.push_back(new Scene(window));
+	scenes.push_back(new Scene(window));
 
 	callbacks = new Callbacks(window);
 
@@ -108,38 +113,38 @@ void Application::CreateModels() {
 	Model* modelPlane = new Model(plane);
 	Model* modelTriangle = new Model(triangle);
 
-	Material* Blue = new Material(glm::vec3(0.1f, 0.1f, 0.8f), glm::vec3(0.1f, 0.1f, 0.2f), 32);
-	Material* Red = new Material(glm::vec3(0.8f, 0.1f, 0.1f), glm::vec3(0.2f, 0.1f, 0.1f), 16);
-	Material* Green = new Material(glm::vec3(0.1f, 0.6f, 0.1f), glm::vec3(0.1f, 0.2f, 0.1f), 8);
+	Material* Blue = new Material(glm::vec3(0.1f, 0.1f, 0.7f), glm::vec3(0.1f, 0.1f, 0.2f), 32);
+	Material* Red = new Material(glm::vec3(0.7f, 0.1f, 0.1f), glm::vec3(0.2f, 0.1f, 0.1f), 32);
+	Material* Green = new Material(glm::vec3(0.1f, 0.7f, 0.1f), glm::vec3(0.1f, 0.2f, 0.1f), 32);
 	Material* White = new Material(glm::vec3(1.f, 1.f, 1.f), glm::vec3(1.f, 1.f, 1.f), 32);
+	Material* def = new Material();
 
 	TransformationBuilder transformationBuilder;
 	ShaderProgramBuilder shaderProgramBuilder;
 
-	ShaderProgram* constantWhite = shaderProgramBuilder.CREATE(CONSTANT, White).Build();
+	ShaderProgram* constant = shaderProgramBuilder.CREATE(CONSTANT).Build();
 	ShaderProgram* lambert = shaderProgramBuilder.CREATE(LAMBERT).Build();
 	ShaderProgram* phong = shaderProgramBuilder.CREATE(PHONG).Build();
 	ShaderProgram* blinn = shaderProgramBuilder.CREATE(BLINN).Build();
 
-	ShaderProgram* blinnGreen = shaderProgramBuilder.CREATE(BLINN, Green).Build();
-	ShaderProgram* lambertRed = shaderProgramBuilder.CREATE(LAMBERT, Red).Build();
-	ShaderProgram* constantBlue = shaderProgramBuilder.CREATE(CONSTANT, Blue).Build();
 
 	Light* whiteLight = new Light(glm::vec3(1.0, 1.0, 1.0));
+	Light* redLight = new Light(glm::vec3(1.0, 0.0, 0.0));
+	Light* blueLight = new Light(glm::vec3(0.0, 0.0, 1.0));
+	Light* greenLight = new Light(glm::vec3(0.0, 1.0, 0.0));
 
 	////---------------------------------------------------------------------------------------////
 	////                               monkey solar system                                     ////
 
 	TransformationComposite* lightTrans = transformationBuilder.SCALE(0.5f).ROTATE(1, 1, 1, true).TRANSLATE(15,2,0).Build();
-
-	scenes[0]->AddDrawableLightModel(modelSphere,constantWhite, whiteLight, lightTrans);
+	scenes[0]->AddDrawableLightModel(modelSphere, constant, whiteLight, White, lightTrans);
 
 	TransformationComposite* sun_t = transformationBuilder
 		//.TRANSLATE(0, 0, 0.01, true)
 		.ROTATE(0.03f, 0.08f, 0.05f, true)
 		.SCALE(4.f)
 		.Build();
-	scenes[0]->AddDrawableModel(modelSuzi, lambertRed, sun_t);
+	scenes[0]->AddDrawableModel(modelSuzi, phong, def, sun_t);
 
 	TransformationComposite* earth_t = transformationBuilder
 		//.TRANSLATE(0, 0, 0.01, true)
@@ -147,7 +152,7 @@ void Application::CreateModels() {
 		.TRANSLATE(20.f, 0.f, 0.f)
 		.ROTATE(0.f, 0.2f, 0.0f, true)
 		.Build();
-	scenes[0]->AddDrawableModel(modelSuzi, phong, earth_t);
+	scenes[0]->AddDrawableModel(modelSuzi, phong, def, earth_t);
 
 	TransformationComposite* moon_t = transformationBuilder
 		.COMPONENT(earth_t)
@@ -156,7 +161,7 @@ void Application::CreateModels() {
 		.TRANSLATE(5.f, -1.f, 5.f)
 		.ROTATE(0.f, 0.2f, 0.f, true)
 		.Build();
-	scenes[0]->AddDrawableModel(modelSuzi, blinn, moon_t);
+	scenes[0]->AddDrawableModel(modelSuzi, blinn, def, moon_t);
 
 	TransformationComposite* moon_of_moon_t = transformationBuilder
 		.COMPONENT(moon_t)
@@ -165,7 +170,7 @@ void Application::CreateModels() {
 		.TRANSLATE(3.f, -1.f, 3.f)
 		.ROTATE(0.f, 0.0f, 0.9f, true)
 		.Build();
-	scenes[0]->AddDrawableModel(modelSuzi, constantBlue, moon_of_moon_t);
+	scenes[0]->AddDrawableModel(modelSuzi, constant, def, moon_of_moon_t);
 
 	////---------------------------------------------------------------------------------------////
 	////                                       forest                                          ////
@@ -173,16 +178,55 @@ void Application::CreateModels() {
 	for (int i = 0; i < 100; i++)
 	{
 		scenes[1]->AddDrawableModel(modelTree, phong, TransformationRandomizer::CreateRandomTransformation());
-		scenes[1]->AddDrawableModel(modelBush, blinnGreen, TransformationRandomizer::CreateRandomTransformation());
+		scenes[1]->AddDrawableModel(modelBush, blinn, Green, TransformationRandomizer::CreateRandomTransformation());
 	}
 
 	TransformationComposite* planeTransformation = transformationBuilder.SCALE(60).Build();
+	scenes[1]->AddDrawableModel(modelPlane, lambert, def, planeTransformation);
 
-	scenes[1]->AddDrawableModel(modelPlane, lambert, planeTransformation);
+	//TransformationComposite* lightTransformation = transformationBuilder.ROTATE(0,1,0, true).TRANSLATE(20,20,0).Build();
+	//scenes[1]->AddDrawableLightModel(modelSuzi, constant, whiteLight, White, lightTransformation);
 
-	TransformationComposite* lightTransformation = transformationBuilder.ROTATE(0,1,0, true).TRANSLATE(20,20,0).Build();
+	TransformationComposite* bug1 = transformationBuilder
+		.TRANSLATE(0, 0, 0.005, true)
+		.ROTATE(0.f, -0.1f, .0f, true)
+		.TRANSLATE(-15.f, 2.f, 0.f)
+		.ROTATE(0.f, 0.2f, 0.0f, true)
+		.TRANSLATE(10.f, 0.f, 0.f)
+		.ROTATE(0.f, 0.2f, 0.0f, true)
+		.TRANSLATE(-5.f, 0.f, 0.f)
+		.SCALE(0.3f)
+		.Build();
 
-	scenes[1]->AddDrawableLightModel(modelSuzi, constantWhite, whiteLight, lightTransformation);
+	TransformationComposite* bug2 = transformationBuilder
+		.ROTATE(0.f, 0.1f, .0f, true)
+		.TRANSLATE(10.f, 2.f, 0.f)
+		.ROTATE(0.f, 0.2f, 0.0f, true)
+		.TRANSLATE(15.f, 0.f, 0.f)
+		.ROTATE(0.f, 0.15f, 0.0f, true)
+		.TRANSLATE(5.f, 0.f, 0.f)
+		.ROTATE(0.f, 0.1f, 0.f, true)
+		.TRANSLATE(10.f, 0.f, 0.f)
+		.SCALE(0.2f)
+		.Build();
+
+	TransformationComposite* bug3 = transformationBuilder
+		.ROTATE(0.f, 0.1f, .0f, true)
+		.TRANSLATE(5.f, 1.5f, 0.f)
+		.ROTATE(0.f, 0.2f, 0.0f, true)
+		.TRANSLATE(-8.f, 0.f, 0.f)
+		.ROTATE(0.f, 0.15f, 0.0f, true)
+		.TRANSLATE(5.f, 0.f, 0.f)
+		.ROTATE(0.f, -0.1f, 0.f, true)
+		.TRANSLATE(-13.f, 0.f, 0.f)
+		.ROTATE(0.f, 0.1f, 0.f, true)
+		.TRANSLATE(15.f, 0.f, 0.f)
+		.SCALE(0.3f)
+		.Build();
+
+	scenes[1]->AddDrawableLightModel(modelSuzi, constant, whiteLight, White, bug1);
+	scenes[1]->AddDrawableLightModel(modelSuzi, constant, redLight, Red, bug2);
+	scenes[1]->AddDrawableLightModel(modelSuzi, constant, whiteLight, White, bug3);
 
 
 	////---------------------------------------------------------------------------------------////
@@ -198,17 +242,31 @@ void Application::CreateModels() {
 	scenes[2]->AddDrawableModel(modelSphere, phong, tc3);
 	scenes[2]->AddDrawableModel(modelSphere, phong, tc4);
 
-	TransformationComposite* tclight = transformationBuilder.SCALE(0.1f).Build();
+	TransformationComposite* tclight = transformationBuilder.SCALE(0.1f).TRANSLATE(0,1,0).Build();
+	scenes[2]->AddDrawableLightModel(modelSphere, constant, whiteLight, White, tclight);
 
-	//scenes[2]->AddDrawableLightModel(modelSphere, constantWhite, whiteLight, tclight);
-	scenes[2]->AddDrawableLight(whiteLight, tclight);
+	TransformationComposite* tclight2 = transformationBuilder.TRANSLATE(0, -10, 0).SCALE(0.1f).Build();
+	scenes[2]->AddDrawableLightModel(modelSphere, constant, redLight, Red, tclight2);
 
 	////---------------------------------------------------------------------------------------////
 	////                                      triangle                                         ////
 
-	ShaderProgram* constantTriangle = shaderProgramBuilder.CREATE(CONSTANT).Build();
+	scenes[3]->AddDrawableModel(modelTriangle, constant, Blue);
 
-	scenes[3]->AddDrawableModel(modelTriangle, constantBlue);
+	////---------------------------------------------------------------------------------------////
+	////                                   all shaders                                         ////
+
+	TransformationComposite* tc5 = transformationBuilder.ROTATE(180, 5, 45).TRANSLATE(4, 0, 4).Build();
+	TransformationComposite* tc6 = transformationBuilder.ROTATE(0,5,10).TRANSLATE(-2, 0, 1).Build();
+	TransformationComposite* tc7 = transformationBuilder.ROTATE(1,0,1,true).TRANSLATE(2, 0, 2).Build();
+
+
+	scenes[4]->AddDrawableModel(modelTree, phong, tc6);
+	scenes[4]->AddDrawableModel(modelSphere, lambert, Red);
+	scenes[4]->AddDrawableModel(modelSuzi, blinn, tc5);
+	scenes[4]->AddDrawableModel(modelTriangle, constant, Blue, tc7);
+
+	scenes[4]->AddDrawableLightModel(modelSphere, constant, whiteLight, White, transformationBuilder.SCALE(0.2f).TRANSLATE(10,5,0).Build());
 
 }
 
@@ -256,4 +314,20 @@ void Application::ResizeWindow(int w, int h) {
 	{
 		s->ResizeWindow(w, h);
 	}
+}
+
+float Application::CalculateFPS() {
+	static int frameCount = 0;
+	static double previousTime = 0.0;
+	static float fps = 0.0;
+
+	double currentTime = glfwGetTime();
+	frameCount++;
+
+	if (currentTime - previousTime >= 1.0) {
+		fps = frameCount / (currentTime - previousTime);
+		previousTime = currentTime;
+		frameCount = 0;
+	}
+	return fps;
 }

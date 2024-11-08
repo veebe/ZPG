@@ -1,7 +1,6 @@
 #pragma once
 
 #include "ShaderProgram.h"
-#include "Material.h"
 
 enum SHADERTYPES {
     CONSTANT,
@@ -15,7 +14,6 @@ public:
     ShaderProgramBuilder();
 
     ShaderProgramBuilder& CREATE(SHADERTYPES AST);
-    ShaderProgramBuilder& CREATE(SHADERTYPES AST, Material* AMaterial);
 
     ShaderProgram* Build();
 

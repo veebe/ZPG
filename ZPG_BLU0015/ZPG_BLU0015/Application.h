@@ -37,6 +37,8 @@ private:
 
     Application() = default;
 	void ProcessInput(GLFWwindow* window);
+	float CalculateFPS();
+
 	std::vector<Scene*> scenes;
     GLFWwindow* window;
     Callbacks* callbacks;
@@ -51,20 +53,5 @@ private:
 
 	double lastTime = 0.0f;
 	double deltaTime = 0.0f;
-	/*
-	std::vector<float> plane = {
-	-1.0f, 0.0f, -1.0f,   0.0f, 1.0f, 0.0f,
-	 1.0f, 0.0f, -1.0f,   0.0f, 1.0f, 0.0f,
-	 1.0f, 0.0f,  1.0f,   0.0f, 1.0f, 0.0f,
 
-	 -1.0f, 0.0f, -1.0f,   0.0f, 1.0f, 0.0f,
-	 -1.0f, 0.0f,  1.0f,   0.0f, 1.0f, 0.0f,
-	  1.0f, 0.0f,  1.0f,   0.0f, 1.0f, 0.0f
-	};
-
-	std::vector<float> triangle = {
-		-1.0f, -1.0f, 0.0f,   0.0f, 1.0f, 0.0f,
-		 1.0f, -1.0f, 0.0f,   0.0f, 1.0f, 0.0f,
-		 1.0f, 1.0f,  0.0f,   0.0f, 1.0f, 0.0f
-	};*/
 };

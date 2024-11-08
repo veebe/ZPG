@@ -11,7 +11,6 @@ Camera::Camera() {
 
 glm::mat4 Camera::GetProjectionMatrix() {
 	return glm::perspective(glm::radians(60.f), float(Width / Height), 0.1f, 100.0f);
-	
 }
 
 glm::mat4 Camera::GetViewMatrix() {
@@ -19,7 +18,7 @@ glm::mat4 Camera::GetViewMatrix() {
 }
 
 glm::vec3 Camera::GetCameraPosition() {
-	return this->eye;
+	return glm::vec3( this->eye.x, this->eye.y, this->eye.z);
 }
 
 void Camera::ResizeWindow(int w, int h) {

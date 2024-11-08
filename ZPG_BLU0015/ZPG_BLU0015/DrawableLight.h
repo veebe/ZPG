@@ -9,6 +9,7 @@ public:
 	void DrawObject() override;
 	void ApplyLight(Light* ALight) override;
 	void ApplyCamera(Camera* ACamera) override;
+	void ClearLights() override;
 private:
 	Light* light;
 };

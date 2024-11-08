@@ -5,20 +5,29 @@ Scene::Scene(GLFWwindow* window){
 	this->camera = new Camera();
 }
 
-void Scene::AddDrawableModel(Model* Amodel, ShaderProgram* ASP, TransformationComposite* ATransformation) {
-	
-	drawableObjects.push_back(new DrawableModel(Amodel, ASP, GetTransformation(ATransformation)));
+void Scene::AddDrawableModel(Model* Amodel, ShaderProgram* ASP, Material* AMaterial, TransformationComposite* ATransformation) {
+	drawableObjects.push_back(new DrawableModel(Amodel, ASP, GetTransformation(ATransformation), GetMaterial(AMaterial)));
 }
 
-void Scene::AddDrawableLightModel(Model* Amodel, ShaderProgram* ASP, Light* ALight, TransformationComposite* ATransformation) {
-	
-	this->light = ALight;
-	drawableObjects.push_back(new DrawableLightModel(Amodel, ASP, GetTransformation(ATransformation), ALight));
+void Scene::AddDrawableModel(Model* Amodel, ShaderProgram* ASP, TransformationComposite* ATransformation, Material* AMaterial) {
+	drawableObjects.push_back(new DrawableModel(Amodel, ASP, GetTransformation(ATransformation), GetMaterial(AMaterial)));
+}
+
+void Scene::AddDrawableLightModel(Model* Amodel, ShaderProgram* ASP, Light* ALight, Material* AMaterial, TransformationComposite* ATransformation) {
+	Light* DetachedLight = new Light(*ALight);
+	lights.push_back(DetachedLight);
+	drawableObjects.push_back(new DrawableLightModel(Amodel, ASP, GetTransformation(ATransformation), GetMaterial(AMaterial), DetachedLight));
+}
+
+void Scene::AddDrawableLightModel(Model* Amodel, ShaderProgram* ASP, Light* ALight, TransformationComposite* ATransformation, Material* AMaterial) {
+	Light* DetachedLight = new Light(*ALight);
+	lights.push_back(DetachedLight);
+	drawableObjects.push_back(new DrawableLightModel(Amodel, ASP, GetTransformation(ATransformation), GetMaterial(AMaterial), DetachedLight));
 }
 
 void Scene::AddDrawableLight(Light* ALight, TransformationComposite* ATransformation) {
 
-	this->light = ALight;
+	lights.push_back(ALight);
 	drawableObjects.push_back(new DrawableLight(ALight, GetTransformation(ATransformation)));
 }
     
@@ -49,6 +58,12 @@ TransformationComposite* Scene::GetTransformation(TransformationComposite* ATran
 	return new TransformationComposite();
 }
 
+Material* Scene::GetMaterial(Material* AMaterial) {
+	if (AMaterial)
+		return AMaterial;
+	return new Material();
+}
+
 void Scene::ResizeWindow(int w, int h) {
 	this->camera->ResizeWindow(w, h);
 }
@@ -59,8 +74,15 @@ void Scene::ApplyCamera() {
 	}
 }
 
+void Scene::ClearLight() {
+	for (auto doj : drawableObjects) {
+		doj->ClearLights();
+	}
+}
+
 void Scene::ApplyLight() {
 	for (auto doj : drawableObjects) {
-		doj->ApplyLight(this->light);
+		for(auto light : lights)
+			doj->ApplyLight(light);
 	}
 }

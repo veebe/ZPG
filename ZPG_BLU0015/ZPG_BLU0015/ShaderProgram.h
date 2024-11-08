@@ -24,17 +24,16 @@ public:
 	void OnCameraChangedView();
 	void OnLightChangePosition();
 	void OnLightChangeColor();
-	void OnMaterialChange();
+	void OnLightChangeStrength();
 
 	void OnUpdate(NotifyType ANotifyType) override;
 
 	void AddCamera(Camera* ACamera);
 	void AddLight(Light* ALight);
-	void AddMaterial(Material* AMaterial);
+	void ClearLights();
 private:
 	Camera* camera;
-	Light* light;
-	Material* material;
+	vector<Light*> lights;
 	void CheckShader();
-
+	void UpdateLightSize();
 };

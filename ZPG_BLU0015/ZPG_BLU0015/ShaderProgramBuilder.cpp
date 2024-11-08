@@ -4,12 +4,6 @@ ShaderProgramBuilder::ShaderProgramBuilder() : SP(nullptr) {}
 
 ShaderProgramBuilder& ShaderProgramBuilder::CREATE(SHADERTYPES AST) {
 	CreateShader(AST);
-	SP->AddMaterial(new Material());
-	return *this;
-}
-ShaderProgramBuilder& ShaderProgramBuilder::CREATE(SHADERTYPES AST, Material* AMaterial) {
-	CreateShader(AST);
-	SP->AddMaterial(AMaterial);
 	return *this;
 }
 

@@ -43,7 +43,7 @@ private:
     float yaw = -90.0f;
     float pitch = 0.0f;
 
-    int Width = 800.f;
-    int Height = 600.f;
+    int Width = 800;
+    int Height = 600;
 
 };

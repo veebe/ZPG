@@ -45,22 +45,27 @@ void ShaderProgram::AddCamera(Camera* ACamera) {
 	OnCameraChangedView();
 }
 
+void ShaderProgram::ClearLights() {
+	this->lights.clear();
+}
+
 void ShaderProgram::AddLight(Light* ALight) {
-	this->light = ALight;
-	if (this->light) {
-		this->light->Attach(this);
+	if (!ALight) return;
+
+	for (auto* existingLight : lights) {
+		if (existingLight == ALight) {
+			return;
+		}
 	}
+
+	lights.push_back(ALight);
+	ALight->Attach(this);
+	
 	OnLightChangePosition();
 	OnLightChangeColor();
-	
+	OnLightChangeStrength();
+	UpdateLightSize();
 }
-
-void ShaderProgram::AddMaterial(Material* AMaterial) {
-	this->material = AMaterial;
-	this->material->Attach(this);
-	OnMaterialChange();
-}
-
 
 void ShaderProgram::UseShader(){
 	glUseProgram(shaderProgramID);
@@ -92,11 +97,6 @@ void ShaderProgram::ApplyTransformation(glm::mat4 M) {
 	if (idModelTransform == -1)
 		exit;
 	glUniformMatrix4fv(idModelTransform, 1, GL_FALSE, &M[0][0]);
-
-	GLint idCameraPosition = glGetUniformLocation(shaderProgramID, "cameraPosition");
-	if (idCameraPosition == -1)
-		exit;
-	glUniformMatrix4fv(idCameraPosition, 1, GL_FALSE, glm::value_ptr(camera->GetCameraPosition()));
 }
 
 void ShaderProgram::OnCameraChangedView()
@@ -105,6 +105,11 @@ void ShaderProgram::OnCameraChangedView()
 	if (idModelTransform == -1)
 		exit;
 	glProgramUniformMatrix4fv(this->shaderProgramID, idModelTransform, 1, GL_FALSE, glm::value_ptr(camera->GetViewMatrix()));
+
+	GLint idCameraPosition = glGetUniformLocation(this->shaderProgramID, "cameraPosition");
+	if (idCameraPosition == -1)
+		exit;
+	glProgramUniform3fv(this->shaderProgramID, idCameraPosition, 1, glm::value_ptr(camera->GetCameraPosition()));
 }
 
 void ShaderProgram::OnCameraChangedProjection()
@@ -113,31 +118,47 @@ void ShaderProgram::OnCameraChangedProjection()
 	if (idModelTransform == -1)
 		exit;
 	glProgramUniformMatrix4fv(this->shaderProgramID, idModelTransform, 1, GL_FALSE, glm::value_ptr(camera->GetProjectionMatrix()));
+
+	GLint idCameraPosition = glGetUniformLocation(shaderProgramID, "cameraPosition");
+	if (idCameraPosition == -1)
+		exit;
+	glProgramUniform3fv(this->shaderProgramID, idCameraPosition, 1, glm::value_ptr(camera->GetCameraPosition()));
 }
 
 void ShaderProgram::OnLightChangePosition() {
-	GLuint idLightPosition = glGetUniformLocation(this->shaderProgramID, "lightPosition");
-	if (idLightPosition == -1)
-		exit;
-	if(this->light)
-		glProgramUniform3fv(this->shaderProgramID, idLightPosition, 1, glm::value_ptr(light->GetLightPosition()));
-	else
-		glProgramUniform3fv(this->shaderProgramID, idLightPosition, 1, glm::value_ptr(glm::vec3(0,0,0)));
+	for (int i = 0; i < lights.size(); i++) {
+
+		char uniformName[32];
+		std::snprintf(uniformName, sizeof(uniformName), "lights[%d].position", i);
+
+		GLuint idLightPosition = glGetUniformLocation(this->shaderProgramID, uniformName);
+		glProgramUniform3fv(this->shaderProgramID, idLightPosition, 1, glm::value_ptr(lights[i]->GetLightPosition()));
+	}
 }
 
 void ShaderProgram::OnLightChangeColor() {
-	GLuint idLightPosition = glGetUniformLocation(this->shaderProgramID, "lightColor");
-	if (idLightPosition == -1)
-		exit;
-	if (this->light)
-		glProgramUniform3fv(this->shaderProgramID, idLightPosition, 1, glm::value_ptr(light->GetLightColor()));
-	else
-		glProgramUniform3fv(this->shaderProgramID, idLightPosition, 1, glm::value_ptr(glm::vec3(0,0,0)));
+	for (int i = 0; i < lights.size(); i++) {
+		char uniformName[32];
+		std::snprintf(uniformName, sizeof(uniformName), "lights[%d].color", i);
 
+		GLuint idLightColor = glGetUniformLocation(this->shaderProgramID, uniformName);
+		glProgramUniform3fv(this->shaderProgramID, idLightColor, 1, glm::value_ptr(lights[i]->GetLightColor()));
+	}
 }
 
-void ShaderProgram::OnMaterialChange() {
-	ApplyMaterial(this->material);
+void ShaderProgram::OnLightChangeStrength() {
+	for (int i = 0; i < lights.size(); i++) {
+		char uniformName[32];
+		std::snprintf(uniformName, sizeof(uniformName), "lights[%d].strength", i);
+
+		GLuint idLightStrength = glGetUniformLocation(this->shaderProgramID, uniformName);
+		glProgramUniform1f(this->shaderProgramID, idLightStrength, lights[i]->GetLightStrength());
+	}
+}
+
+void ShaderProgram::UpdateLightSize() {
+	GLuint idLightNumber = glGetUniformLocation(this->shaderProgramID, "numLights");
+	glProgramUniform1i(this->shaderProgramID, idLightNumber, lights.size());
 }
 
 void ShaderProgram::OnUpdate(NotifyType ANotifyType) {
@@ -153,9 +174,6 @@ void ShaderProgram::OnUpdate(NotifyType ANotifyType) {
 		break;
 	case LIGHTCOLOR:
 		OnLightChangeColor();
-		break;
-	case MATERIAL:
-		OnMaterialChange();
 		break;
 	default:
 		break;

@@ -10,11 +10,13 @@
 
 class DrawableObject {
 public:
+	virtual ~DrawableObject() {};
 	DrawableObject(TransformationComposite* ATransformation);
 
 	virtual void DrawObject() = 0;
 	virtual void ApplyLight(Light* ALight) = 0;
 	virtual void ApplyCamera(Camera* ACamera) = 0;
+	virtual void ClearLights() = 0;
 protected:
 	TransformationComposite* transformation;
 };

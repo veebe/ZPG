@@ -9,3 +9,4 @@ void DrawableLight::DrawObject() {
 
 void DrawableLight::ApplyLight(Light* ALight) {};
 void DrawableLight::ApplyCamera(Camera* ACamera) {};
+void DrawableLight::ClearLights() {};
