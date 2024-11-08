@@ -76,6 +76,7 @@ void Application::Initialization() {
 	scenes.push_back(new Scene(window));
 	scenes.push_back(new Scene(window));
 	scenes.push_back(new Scene(window));
+	scenes.push_back(new Scene(window));
 
 	callbacks = new Callbacks(window);
 
@@ -268,6 +269,37 @@ void Application::CreateModels() {
 
 	scenes[4]->AddDrawableLightModel(modelSphere, constant, whiteLight, White, transformationBuilder.SCALE(0.2f).TRANSLATE(10,5,0).Build());
 
+	////---------------------------------------------------------------------------------------////
+	////                                      gravity                                          ////
+
+
+	TransformationComposite* ballPlaneTransformation = transformationBuilder.TRANSLATE(0, -1, 0).SCALE(20).Build();
+	scenes[5]->AddDrawableModel(modelPlane, lambert, def, ballPlaneTransformation);
+
+	TransformationComposite* BoundingBallT = transformationBuilder.GRAVITY(-2, 30, -3).ROTATE(1.f,1.f,0,true).Build();
+	scenes[5]->AddDrawableModel(modelSuzi, blinn, def, BoundingBallT);
+
+	TransformationComposite* BoundingBallT2 = transformationBuilder.GRAVITY(15, 20, 0,4,80).Build();
+	scenes[5]->AddDrawableModel(modelSphere, blinn, Red, BoundingBallT2);
+
+	TransformationComposite* BoundingBallT3 = transformationBuilder.GRAVITY(10, 40, 5,2,95).Build();
+	scenes[5]->AddDrawableModel(modelSphere, blinn, Green, BoundingBallT3);
+
+	TransformationComposite* BoundingBallT4 = transformationBuilder.GRAVITY(5, 15, -8).Build();
+	scenes[5]->AddDrawableModel(modelSphere, blinn, Blue, BoundingBallT4);
+	
+	TransformationComposite* BallLightT = transformationBuilder.GRAVITY(5,5,5).TRANSLATE(-0.01f, 0, 0.01f, true).Build();
+	scenes[5]->AddDrawableLightModel(modelSphere, constant, whiteLight, BallLightT,White);
+
+	TransformationComposite* BoundingBallT5 = transformationBuilder.GRAVITY(-10, 30, -10,4).ROTATE(0, 1.f, 0, true).TRANSLATE(4, 0, 0).Build();
+	scenes[5]->AddDrawableModel(modelSphere, blinn, Blue, BoundingBallT5);
+
+	TransformationComposite* BallLightT2 = transformationBuilder.GRAVITY(-10, 20, -10).Build();
+	scenes[5]->AddDrawableLightModel(modelSphere, constant, whiteLight, BallLightT2, White);
+
+	//TransformationComposite* BallLightT3 = transformationBuilder.TRANSLATE(10, 10, 10).Build();
+	//scenes[5]->AddDrawableLightModel(modelSuzi, constant, redLight, BallLightT3, Red);
+
 }
 
 void Application::MoveActiveCameraMouse(double x, double y) {
@@ -330,4 +362,8 @@ float Application::CalculateFPS() {
 		frameCount = 0;
 	}
 	return fps;
+}
+
+double Application::GetDeltaTime() {
+	return deltaTime;
 }

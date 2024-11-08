@@ -3,6 +3,7 @@
 #include "TransformationRotate.h"
 #include "TransformationTranslate.h"
 #include "TransformationScale.h"
+#include "TransformationGravity.h"
 
 class TransformationBuilder {
 public:
@@ -12,6 +13,7 @@ public:
     TransformationBuilder& ROTATE(float x, float y, float z, bool Repeat = false);
     TransformationBuilder& SCALE(float scale);
     TransformationBuilder& TRANSLATE(float x, float y, float z, bool Repeat = false);
+    TransformationBuilder& GRAVITY(float x, float y, float z, float AAcceleration = 3, float ABounce = 93);
 
     TransformationComposite* Build();
 

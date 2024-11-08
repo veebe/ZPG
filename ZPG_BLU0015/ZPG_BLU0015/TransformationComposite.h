@@ -1,13 +1,15 @@
 #pragma once
 #include "Transformation.h"
-#include "TransformationRotate.h"
+#include "TransformationGravity.h"
 
 class TransformationComposite : public Transformation {
-private:
-    std::vector<Transformation*> transformations;
 public:
     void AddTransformation(Transformation* transformation);
     glm::mat4 GetTransformationMatrix() override;
+    Transformation* GetSingleTransformationMatrix(int AIndex);
+
     ~TransformationComposite();
     Transformation* Clone() const override;
+private:
+    std::vector<Transformation*> transformations;
 };

@@ -29,3 +29,8 @@ TransformationComposite* TransformationBuilder::Build() {
     composite = new TransformationComposite();
     return result;
 }
+
+TransformationBuilder& TransformationBuilder::GRAVITY(float x, float y, float z, float AAcceleration, float ABounce) {
+    composite->AddTransformation(new TransformationGravity(x, y, z, AAcceleration, ABounce));
+    return *this;
+}

@@ -33,6 +33,7 @@ public:
 	void ResizeWindow(int w, int h);
 
     static Application& getInstance();
+	double GetDeltaTime();
 private:
 
     Application() = default;

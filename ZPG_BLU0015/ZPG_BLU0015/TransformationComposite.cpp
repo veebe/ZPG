@@ -25,3 +25,7 @@ Transformation* TransformationComposite::Clone() const {
     }
     return clone;
 }
+
+Transformation* TransformationComposite::GetSingleTransformationMatrix(int AIndex) {
+    return transformations[AIndex];
+}
