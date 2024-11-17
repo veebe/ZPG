@@ -1,11 +1,10 @@
 #version 330
 in vec4 ex_worldPosition;
 in vec3 ex_worldNormal;
-in vec3 ex_cameraDirection;
 out vec4 frag_colour;
 
 
-#define MAX_LIGHTS 4
+#define MAX_LIGHTS 10
 uniform int numLights;
 
 struct light
@@ -13,6 +12,7 @@ struct light
   vec3 position;
   vec3 color;
   float strength;
+  int type;
 };
 
 uniform light lights[MAX_LIGHTS]; 
@@ -21,17 +21,26 @@ uniform vec3 ambient;
 uniform vec3 objectColor;
 uniform float shininess;
 
+uniform vec3 cameraDirection;
+uniform vec3 cameraPosition;
+
 void main() {
     vec3 worldPosition = ex_worldPosition.xyz / max(ex_worldPosition.w, 0.00001);
 
-    vec3 viewDir = normalize(ex_cameraDirection);
+    vec3 viewDir = normalize(cameraPosition - worldPosition);
     vec3 normal = normalize(ex_worldNormal);
 
     vec3 totalDiffuse = vec3(0.0);
     vec3 totalSpecular = vec3(0.0);
 
     for (int i = 0; i < numLights; ++i) {
-        vec3 lv_not_norm = lights[i].position - worldPosition;
+        
+        vec3 lv_not_norm;
+        if (lights[i].type == 1)
+            lv_not_norm = normalize(lights[i].position); 
+        else 
+            lv_not_norm = lights[i].position - worldPosition;
+        
         float fdistance = length(lv_not_norm);
         vec3 lightVector = normalize(lv_not_norm);
 
@@ -40,18 +49,38 @@ void main() {
         // Diffuse component
         float diff = max(dot(normal, lightVector), 0.0);
         vec3 diffuse = diff * lights[i].color;
-        totalDiffuse += diffuse * dimming;
+        
 
         // Specular component
         vec3 reflectDir = reflect(-lightVector, normal);
         float spec = 0.0;
         if (diff > 0.0) {
-            spec = pow(max(dot(reflectDir, viewDir), 0.0), shininess);
+            spec = pow(max(dot(normalize(reflectDir), viewDir), 0.0), shininess);
         }
         vec3 specular = spec * lights[i].color;
-        totalSpecular += specular * dimming;
+        if (lights[i].type == 2) {
+            float spotEffect = dot(normalize(cameraDirection), -lightVector);
+            if (spotEffect < 0.99) continue;
+            spotEffect = (spotEffect - 0.99) / (1.0 - 0.99);
+
+            totalDiffuse += diffuse * dimming * spotEffect;
+            totalSpecular += specular * dimming * spotEffect;
+        }
+        else if (lights[i].type == 1){
+            if (lights[i].position.y > 0){
+                float log_var = log(10 * lightVector.y + 1.0) / log(10 + 1.0);
+                totalDiffuse += diffuse * dimming * log_var;
+                totalSpecular += specular * dimming * log_var;
+            }
+            else{
+                continue;
+            }            
+        }
+        else{
+            totalDiffuse += diffuse * dimming;
+            totalSpecular += specular * dimming;
+        }
     }
     frag_colour = vec4((ambient + totalDiffuse + totalSpecular) * objectColor, 1.0);
-
-
+    //frag_colour = vec4((totalDiffuse) * 1, 1.0);
 }

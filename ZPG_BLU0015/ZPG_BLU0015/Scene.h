@@ -17,6 +17,7 @@
 #include "TransformationScale.h"
 #include "TransformationTranslate.h"
 #include "Light.h"
+#include "LightReflector.h"
 
 using namespace std;
 
@@ -29,6 +30,7 @@ public:
     void AddDrawableLightModel(Model* Amodel, ShaderProgram* ASP, Light* ALight, Material* AMaterial = nullptr, TransformationComposite* ATransformation = nullptr);
     void AddDrawableLightModel(Model* Amodel, ShaderProgram* ASP, Light* ALight, TransformationComposite* ATransformation = nullptr, Material* AMaterial = nullptr);
     void AddDrawableLight(Light* ALight, TransformationComposite* ATransformation = nullptr);
+    void AddLight(Light* ALight);
 
     void Draw();
 

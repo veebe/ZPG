@@ -3,7 +3,7 @@ in vec4 ex_worldPosition;
 in vec3 ex_worldNormal;
 out vec4 frag_colour;
 
-#define MAX_LIGHTS 4
+#define MAX_LIGHTS 10
 uniform int numLights;
 
 struct light
@@ -11,12 +11,16 @@ struct light
   vec3 position;
   vec3 color;
   float strength;
+  int type;
 };
 
 uniform light lights[MAX_LIGHTS]; 
 
 uniform vec3 ambient;
 uniform vec3 objectColor;
+
+uniform vec3 cameraDirection;
+uniform float ReflectorSize;
 
 void main() {
     vec3 worldPosition = ex_worldPosition.xyz / max(ex_worldPosition.w, 0.00001);
@@ -25,8 +29,13 @@ void main() {
     vec3 totalDiffuse;
 
     for (int i = 0; i < numLights; ++i) {
-        
-        vec3 lv_not_norm = lights[i].position - worldPosition;
+
+        vec3 lv_not_norm;
+        if (lights[i].type == 1)
+            lv_not_norm = normalize(lights[i].position); 
+        else 
+            lv_not_norm = lights[i].position - worldPosition;
+            
         float fdistance = length(lv_not_norm);
         vec3 lightVector = normalize(lv_not_norm);
 
@@ -35,7 +44,26 @@ void main() {
         // Diffuse component
         float diff = max(dot(normal, lightVector), 0.0);
         vec3 diffuse = diff * lights[i].color;
-        totalDiffuse += diffuse * dimming;
+
+        if (lights[i].type == 2) {
+            float spotEffect = dot(normalize(cameraDirection), -lightVector);
+            if (spotEffect < 0.99) continue;
+            spotEffect = (spotEffect - 0.99) / (1.0 - 0.99);
+
+            totalDiffuse += diffuse * dimming * spotEffect;
+        }
+        else if (lights[i].type == 1){
+            if (lights[i].position.y > 0){
+                float log_var = log(10 * lightVector.y + 1.0) / log(10 + 1.0);
+                totalDiffuse += diffuse * dimming * log_var;
+            }
+            else{
+                continue;
+            }            
+        }
+        else{
+            totalDiffuse += diffuse * dimming;
+        }
     }
 
 

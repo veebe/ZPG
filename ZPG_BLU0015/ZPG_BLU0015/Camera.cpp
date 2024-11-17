@@ -21,6 +21,10 @@ glm::vec3 Camera::GetCameraPosition() {
 	return glm::vec3( this->eye.x, this->eye.y, this->eye.z);
 }
 
+glm::vec3 Camera::GetCameraDirection() {
+	return this->target;
+}
+
 void Camera::ResizeWindow(int w, int h) {
 	this->Width = w;
 	this->Height = h;

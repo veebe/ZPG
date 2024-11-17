@@ -36,4 +36,12 @@ private:
 	vector<Light*> lights;
 	void CheckShader();
 	void UpdateLightSize();
+
+	void SendVariableToShader(const char* AName, glm::mat4 Avalue);
+	void SendVariableToShader(const char* AName, glm::vec3 Avalue);
+	void SendVariableToShader(const char* AName, float Avalue);
+	void SendVariableToShader(const char* AName, int Avalue);
+
+	bool GetUniLocation(const char* AName);
+	GLint idUniLocation = -1;
 };

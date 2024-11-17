@@ -14,21 +14,36 @@ void Scene::AddDrawableModel(Model* Amodel, ShaderProgram* ASP, TransformationCo
 }
 
 void Scene::AddDrawableLightModel(Model* Amodel, ShaderProgram* ASP, Light* ALight, Material* AMaterial, TransformationComposite* ATransformation) {
+	if (ALight->GetLightType() == REFLECTOR) {
+		AddLight(ALight);
+		return;
+	}
 	Light* DetachedLight = new Light(*ALight);
 	lights.push_back(DetachedLight);
 	drawableObjects.push_back(new DrawableLightModel(Amodel, ASP, GetTransformation(ATransformation), GetMaterial(AMaterial), DetachedLight));
 }
 
 void Scene::AddDrawableLightModel(Model* Amodel, ShaderProgram* ASP, Light* ALight, TransformationComposite* ATransformation, Material* AMaterial) {
+	if (ALight->GetLightType() == REFLECTOR) {
+		AddLight(ALight);
+		return;
+	}
 	Light* DetachedLight = new Light(*ALight);
 	lights.push_back(DetachedLight);
 	drawableObjects.push_back(new DrawableLightModel(Amodel, ASP, GetTransformation(ATransformation), GetMaterial(AMaterial), DetachedLight));
 }
 
 void Scene::AddDrawableLight(Light* ALight, TransformationComposite* ATransformation) {
-
+	if (ALight->GetLightType() == REFLECTOR) {
+		AddLight(ALight);
+		return;
+	}
 	lights.push_back(ALight);
 	drawableObjects.push_back(new DrawableLight(ALight, GetTransformation(ATransformation)));
+}
+
+void Scene::AddLight(Light* ALight) {
+	lights.push_back(ALight);
 }
     
 void Scene::Draw() {
@@ -71,6 +86,12 @@ void Scene::ResizeWindow(int w, int h) {
 void Scene::ApplyCamera() {
 	for (auto doj : drawableObjects) {
 		doj->ApplyCamera(this->camera);
+	}
+	for (auto light : lights) {
+		ReflectorLight* reflector = dynamic_cast<ReflectorLight*>(light);
+		if (reflector) {
+			reflector->AddCamera(this->camera);
+		}
 	}
 }
 

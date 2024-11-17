@@ -30,6 +30,7 @@ public:
     void ResizeWindow(int w, int h);
 
     glm::vec3 GetCameraPosition();
+    glm::vec3 GetCameraDirection();
 private:
 
     void Notify(NotifyType Atype) override; 

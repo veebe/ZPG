@@ -16,6 +16,9 @@
 #include "TransformationRandomizer.h"
 
 #include "Light.h"
+#include "LightReflector.h"
+#include "LightPoint.h"
+#include "LightDirection.h"
 #include "ShaderProgramBuilder.h"
 
 class Application {

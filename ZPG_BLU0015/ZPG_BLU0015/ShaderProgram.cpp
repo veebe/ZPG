@@ -39,10 +39,12 @@ void ShaderProgram::CheckShader() {
 }
 
 void ShaderProgram::AddCamera(Camera* ACamera) {
-	this->camera = ACamera;
-	this->camera->Attach(this);
-	OnCameraChangedProjection();
-	OnCameraChangedView();
+	if (this->camera != ACamera){
+		this->camera = ACamera;
+		this->camera->Attach(this);
+		OnCameraChangedProjection();
+		OnCameraChangedView();
+	}
 }
 
 void ShaderProgram::ClearLights() {
@@ -64,6 +66,7 @@ void ShaderProgram::AddLight(Light* ALight) {
 	OnLightChangePosition();
 	OnLightChangeColor();
 	OnLightChangeStrength();
+
 	UpdateLightSize();
 }
 
@@ -76,53 +79,27 @@ void ShaderProgram::DeleteShader() {
 }
 
 void ShaderProgram::ApplyMaterial(Material* AMaterial) {
-	GLuint idObjectColor = glGetUniformLocation(this->shaderProgramID, "objectColor");
-	if (idObjectColor == -1)
-		exit;
-	glProgramUniform3fv(this->shaderProgramID, idObjectColor, 1, glm::value_ptr(AMaterial->GetObjectColor()));
-
-	GLuint idAmbient = glGetUniformLocation(this->shaderProgramID, "ambient");
-	if (idAmbient == -1)
-		exit;
-	glProgramUniform3fv(this->shaderProgramID, idAmbient, 1, glm::value_ptr(AMaterial->GetAmbientColor()));
-
-	GLuint idShininess = glGetUniformLocation(this->shaderProgramID, "shininess");
-	if (idShininess == -1)
-		exit;
-	glProgramUniform1f(this->shaderProgramID, idShininess, AMaterial->GetShininess());
+	SendVariableToShader("objectColor", AMaterial->GetObjectColor());
+	SendVariableToShader("ambient", AMaterial->GetAmbientColor());
+	SendVariableToShader("shininess", AMaterial->GetShininess());
 }
 
 void ShaderProgram::ApplyTransformation(glm::mat4 M) {
-	GLint idModelTransform = glGetUniformLocation(shaderProgramID, "modelMatrix");
-	if (idModelTransform == -1)
-		exit;
-	glUniformMatrix4fv(idModelTransform, 1, GL_FALSE, &M[0][0]);
+	SendVariableToShader("modelMatrix", M);
 }
 
 void ShaderProgram::OnCameraChangedView()
 {
-	GLuint idModelTransform = glGetUniformLocation(this->shaderProgramID, "viewMatrix");
-	if (idModelTransform == -1)
-		exit;
-	glProgramUniformMatrix4fv(this->shaderProgramID, idModelTransform, 1, GL_FALSE, glm::value_ptr(camera->GetViewMatrix()));
-
-	GLint idCameraPosition = glGetUniformLocation(this->shaderProgramID, "cameraPosition");
-	if (idCameraPosition == -1)
-		exit;
-	glProgramUniform3fv(this->shaderProgramID, idCameraPosition, 1, glm::value_ptr(camera->GetCameraPosition()));
+	SendVariableToShader("viewMatrix", camera->GetViewMatrix());
+	SendVariableToShader("cameraPosition", camera->GetCameraPosition());
+	SendVariableToShader("cameraDirection", camera->GetCameraDirection());
 }
 
 void ShaderProgram::OnCameraChangedProjection()
 {
-	GLuint idModelTransform = glGetUniformLocation(this->shaderProgramID, "projectionMatrix");
-	if (idModelTransform == -1)
-		exit;
-	glProgramUniformMatrix4fv(this->shaderProgramID, idModelTransform, 1, GL_FALSE, glm::value_ptr(camera->GetProjectionMatrix()));
-
-	GLint idCameraPosition = glGetUniformLocation(shaderProgramID, "cameraPosition");
-	if (idCameraPosition == -1)
-		exit;
-	glProgramUniform3fv(this->shaderProgramID, idCameraPosition, 1, glm::value_ptr(camera->GetCameraPosition()));
+	SendVariableToShader("projectionMatrix", camera->GetProjectionMatrix());
+	SendVariableToShader("cameraPosition", camera->GetCameraPosition());
+	SendVariableToShader("cameraDirection", camera->GetCameraDirection());
 }
 
 void ShaderProgram::OnLightChangePosition() {
@@ -131,8 +108,10 @@ void ShaderProgram::OnLightChangePosition() {
 		char uniformName[32];
 		std::snprintf(uniformName, sizeof(uniformName), "lights[%d].position", i);
 
-		GLuint idLightPosition = glGetUniformLocation(this->shaderProgramID, uniformName);
-		glProgramUniform3fv(this->shaderProgramID, idLightPosition, 1, glm::value_ptr(lights[i]->GetLightPosition()));
+		if (lights[i]->GetLightType() == REFLECTOR)
+			SendVariableToShader(uniformName, camera->GetCameraPosition());
+		else
+			SendVariableToShader(uniformName, lights[i]->GetLightPosition());
 	}
 }
 
@@ -141,8 +120,7 @@ void ShaderProgram::OnLightChangeColor() {
 		char uniformName[32];
 		std::snprintf(uniformName, sizeof(uniformName), "lights[%d].color", i);
 
-		GLuint idLightColor = glGetUniformLocation(this->shaderProgramID, uniformName);
-		glProgramUniform3fv(this->shaderProgramID, idLightColor, 1, glm::value_ptr(lights[i]->GetLightColor()));
+		SendVariableToShader(uniformName, lights[i]->GetLightColor());
 	}
 }
 
@@ -151,14 +129,43 @@ void ShaderProgram::OnLightChangeStrength() {
 		char uniformName[32];
 		std::snprintf(uniformName, sizeof(uniformName), "lights[%d].strength", i);
 
-		GLuint idLightStrength = glGetUniformLocation(this->shaderProgramID, uniformName);
-		glProgramUniform1f(this->shaderProgramID, idLightStrength, lights[i]->GetLightStrength());
+		SendVariableToShader(uniformName, lights[i]->GetLightStrength());
 	}
 }
 
 void ShaderProgram::UpdateLightSize() {
-	GLuint idLightNumber = glGetUniformLocation(this->shaderProgramID, "numLights");
-	glProgramUniform1i(this->shaderProgramID, idLightNumber, lights.size());
+	SendVariableToShader("numLights", int(lights.size()));
+
+	for (int i = 0; i < lights.size(); i++) {
+		char uniformName[32];
+		std::snprintf(uniformName, sizeof(uniformName), "lights[%d].type", i);
+
+		SendVariableToShader(uniformName, lights[i]->GetLightType());
+	}
+}
+
+void ShaderProgram::SendVariableToShader(const char* AName, glm::mat4 AValue) {
+	if (GetUniLocation(AName))
+		glProgramUniformMatrix4fv(this->shaderProgramID, idUniLocation, 1, GL_FALSE, glm::value_ptr(AValue));
+}
+void ShaderProgram::SendVariableToShader(const char* AName, glm::vec3 AValue) {
+	if (GetUniLocation(AName))
+		glProgramUniform3fv(this->shaderProgramID, idUniLocation, 1, glm::value_ptr(AValue));
+}
+void ShaderProgram::SendVariableToShader(const char* AName, float AValue) {
+	if (GetUniLocation(AName))
+		glProgramUniform1f(this->shaderProgramID, idUniLocation, AValue);
+}
+void ShaderProgram::SendVariableToShader(const char* AName, int AValue) {
+	if (GetUniLocation(AName))
+		glProgramUniform1i(this->shaderProgramID, idUniLocation, AValue);
+}
+
+bool ShaderProgram::GetUniLocation(const char* AName) {
+	idUniLocation = glGetUniformLocation(shaderProgramID, AName);
+	if (idUniLocation == -1)
+		return false;
+	return true;
 }
 
 void ShaderProgram::OnUpdate(NotifyType ANotifyType) {

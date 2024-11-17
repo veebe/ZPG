@@ -12,8 +12,8 @@ void Application::Run() {
 		deltaTime = currentTime - lastTime;
 		lastTime = currentTime;
 
-		//float fps = CalculateFPS();
-		//printf("FPS: %f\n", fps);
+		float fps = CalculateFPS();
+		printf("FPS: %f\n", fps);
 
 		ProcessInput(this->window);
 
@@ -114,25 +114,37 @@ void Application::CreateModels() {
 	Model* modelPlane = new Model(plane);
 	Model* modelTriangle = new Model(triangle);
 
+	////---------------------------------------------------------------------------------------////
+	////                                   common materials                                    ////
+
 	Material* Blue = new Material(glm::vec3(0.1f, 0.1f, 0.7f), glm::vec3(0.1f, 0.1f, 0.2f), 32);
 	Material* Red = new Material(glm::vec3(0.7f, 0.1f, 0.1f), glm::vec3(0.2f, 0.1f, 0.1f), 32);
 	Material* Green = new Material(glm::vec3(0.1f, 0.7f, 0.1f), glm::vec3(0.1f, 0.2f, 0.1f), 32);
 	Material* White = new Material(glm::vec3(1.f, 1.f, 1.f), glm::vec3(1.f, 1.f, 1.f), 32);
 	Material* def = new Material();
+	Material* Grey = new Material(glm::vec3(0.5, 0.5, 0.5), glm::vec3(0.3, 0.3, 0.3), 8);
 
 	TransformationBuilder transformationBuilder;
 	ShaderProgramBuilder shaderProgramBuilder;
+
+	////---------------------------------------------------------------------------------------////
+	////                                    common shaders                                     ////
 
 	ShaderProgram* constant = shaderProgramBuilder.CREATE(CONSTANT).Build();
 	ShaderProgram* lambert = shaderProgramBuilder.CREATE(LAMBERT).Build();
 	ShaderProgram* phong = shaderProgramBuilder.CREATE(PHONG).Build();
 	ShaderProgram* blinn = shaderProgramBuilder.CREATE(BLINN).Build();
 
+	////---------------------------------------------------------------------------------------////
+	////                                     common lights                                     ////
 
-	Light* whiteLight = new Light(glm::vec3(1.0, 1.0, 1.0));
-	Light* redLight = new Light(glm::vec3(1.0, 0.0, 0.0));
-	Light* blueLight = new Light(glm::vec3(0.0, 0.0, 1.0));
-	Light* greenLight = new Light(glm::vec3(0.0, 1.0, 0.0));
+	Light* whiteLight = new PointLight(glm::vec3(1.0, 1.0, 1.0));
+	Light* redLight = new PointLight(glm::vec3(1.0, 0.0, 0.0));
+	Light* blueLight = new PointLight(glm::vec3(0.0, 0.0, 1.0));
+	Light* greenLight = new PointLight(glm::vec3(0.0, 1.0, 0.0));
+	Light* whiteLightReflector = new ReflectorLight(glm::vec3(1.0, 1.0, 1.0));
+	Light* sunLight = new DirectionLight(glm::vec3(.8f, .8f, .8f), glm::vec3(-0.0f, -1.0f, -0.0f));
+	Light* moonLight = new DirectionLight(glm::vec3(0.2, 0.2, 0.25), glm::vec3(-0.0f, -1.0f, -0.0f));
 
 	////---------------------------------------------------------------------------------------////
 	////                               monkey solar system                                     ////
@@ -185,9 +197,6 @@ void Application::CreateModels() {
 	TransformationComposite* planeTransformation = transformationBuilder.SCALE(60).Build();
 	scenes[1]->AddDrawableModel(modelPlane, lambert, def, planeTransformation);
 
-	//TransformationComposite* lightTransformation = transformationBuilder.ROTATE(0,1,0, true).TRANSLATE(20,20,0).Build();
-	//scenes[1]->AddDrawableLightModel(modelSuzi, constant, whiteLight, White, lightTransformation);
-
 	TransformationComposite* bug1 = transformationBuilder
 		.TRANSLATE(0, 0, 0.005, true)
 		.ROTATE(0.f, -0.1f, .0f, true)
@@ -229,6 +238,13 @@ void Application::CreateModels() {
 	scenes[1]->AddDrawableLightModel(modelSuzi, constant, redLight, Red, bug2);
 	scenes[1]->AddDrawableLightModel(modelSuzi, constant, whiteLight, White, bug3);
 
+	//scenes[1]->AddLight(whiteLightReflector);
+
+	TransformationComposite* sun = transformationBuilder.ROTATE(0.1f, 0.0f, 0.0f, true).TRANSLATE(0, 60, 0).Build();
+	scenes[1]->AddDrawableLightModel(modelSphere,constant, sunLight, sun, White);
+
+	TransformationComposite* moon = transformationBuilder.ROTATE(0.1f, 0.0f, 0.0f, true).TRANSLATE(0, -60, 0).Build();
+	scenes[1]->AddDrawableLightModel(modelSphere, lambert, moonLight, moon, Grey);
 
 	////---------------------------------------------------------------------------------------////
 	////                                       spheres                                         ////
@@ -248,6 +264,8 @@ void Application::CreateModels() {
 
 	TransformationComposite* tclight2 = transformationBuilder.TRANSLATE(0, -10, 0).SCALE(0.1f).Build();
 	scenes[2]->AddDrawableLightModel(modelSphere, constant, redLight, Red, tclight2);
+	
+	scenes[2]->AddLight(whiteLightReflector);
 
 	////---------------------------------------------------------------------------------------////
 	////                                      triangle                                         ////
@@ -268,6 +286,7 @@ void Application::CreateModels() {
 	scenes[4]->AddDrawableModel(modelTriangle, constant, Blue, tc7);
 
 	scenes[4]->AddDrawableLightModel(modelSphere, constant, whiteLight, White, transformationBuilder.SCALE(0.2f).TRANSLATE(10,5,0).Build());
+	scenes[4]->AddLight(sunLight);
 
 	////---------------------------------------------------------------------------------------////
 	////                                      gravity                                          ////
