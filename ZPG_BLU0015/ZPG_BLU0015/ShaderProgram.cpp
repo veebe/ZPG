@@ -73,6 +73,9 @@ void ShaderProgram::AddLight(Light* ALight) {
 void ShaderProgram::UseShader(){
 	glUseProgram(shaderProgramID);
 }
+void ShaderProgram::UnUseShader() {
+	glUseProgram(0);
+}
 
 void ShaderProgram::DeleteShader() {
 	ShaderLoader::deleteShader();
@@ -84,8 +87,17 @@ void ShaderProgram::ApplyMaterial(Material* AMaterial) {
 	SendVariableToShader("shininess", AMaterial->GetShininess());
 }
 
+void ShaderProgram::ApplyTexture(Texture* ATexture) {
+	SendVariableToShader("textureUnitID", ATexture->GetTextureId());
+	SendVariableToShader("UISky", ATexture->GetTextureId());
+}
+
 void ShaderProgram::ApplyTransformation(glm::mat4 M) {
 	SendVariableToShader("modelMatrix", M);
+}
+
+void ShaderProgram::ShowSkyCube(bool AShowSkyCube) {
+	SendVariableToShader("showSkyCube", AShowSkyCube);
 }
 
 void ShaderProgram::OnCameraChangedView()

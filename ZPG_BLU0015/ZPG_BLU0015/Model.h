@@ -8,9 +8,8 @@ public:
 	Model();
 	Model(std::vector<float> AModel);
 	virtual void DrawModel();
-private:
-	std::vector<float> model;
 protected:
-	void BindVAO(GLuint AVBO);
+	virtual void BindVAO(GLuint AVBO);
 	GLuint VAO = 0;
+	std::vector<float> model;
 };

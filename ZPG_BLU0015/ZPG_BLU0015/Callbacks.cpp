@@ -65,6 +65,10 @@ void Callbacks::key_callback(GLFWwindow* window, int key, int scancode, int acti
 	if (key == GLFW_KEY_T && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
 		Application::getInstance().ToggleCursorLock();
 	}
+
+	if (key == GLFW_KEY_U && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
+		Application::getInstance().SetShowSkyCube();
+	}
 }
 
 void Callbacks::window_focus_callback(GLFWwindow* window, int focused) { printf("window_focus_callback \n"); }

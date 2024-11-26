@@ -3,6 +3,7 @@
 #include <vector>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>  
+#include <SOIL.h>
 
 #include "Scene.h"
 #include "Callbacks.h"
@@ -11,6 +12,9 @@
 #include "ModelTree.h"
 #include "ModelSuzi.h"
 #include "ModelSphere.h"
+#include "ModelTextured.h"
+#include "ModelSkyCube.h"
+#include "Texture.h"
 
 #include "TransformationBuilder.h"
 #include "TransformationRandomizer.h"
@@ -28,6 +32,7 @@ public:
     void Initialization();
     void NextScene();
 	void ToggleCursorLock();
+	void SetShowSkyCube();
 
 	void MoveActiveCameraMouse(double x, double y);
 	void MoveActiveCamera(Direction Adirection, double ADeltaTime);
@@ -57,5 +62,4 @@ private:
 
 	double lastTime = 0.0f;
 	double deltaTime = 0.0f;
-
 };

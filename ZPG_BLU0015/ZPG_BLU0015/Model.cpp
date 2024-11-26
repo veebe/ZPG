@@ -17,7 +17,7 @@ Model::Model(std::vector<float> AModel) {
 
 void Model::DrawModel() {
 	glBindVertexArray(VAO);
-	glDrawArrays(GL_TRIANGLES, 0, model.size() / 6); //mode,first,count
+	glDrawArrays(GL_TRIANGLES, 0, model.size() / 6);
 }
 
 void Model::BindVAO(GLuint AVBO) {

@@ -9,16 +9,19 @@
 #include "ShaderLoader.h"
 #include "Light.h"
 #include "Material.h"
+#include "Texture.h"
 
 class ShaderProgram : IObserver,public ShaderLoader {
 public:
 	ShaderProgram(const GLchar* AVertexShader, const GLchar* AFragmentShader, bool AisFile = true);
 
 	void UseShader();
+	void UnUseShader();
 	void DeleteShader();
 
 	void ApplyTransformation(glm::mat4 M);
 	void ApplyMaterial(Material * AMaterial);
+	void ApplyTexture(Texture* ATexture);
 	
 	void OnCameraChangedProjection();
 	void OnCameraChangedView();
@@ -31,6 +34,8 @@ public:
 	void AddCamera(Camera* ACamera);
 	void AddLight(Light* ALight);
 	void ClearLights();
+
+	void ShowSkyCube(bool AShowSkyCube);
 private:
 	Camera* camera;
 	vector<Light*> lights;

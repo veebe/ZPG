@@ -13,7 +13,7 @@ void Application::Run() {
 		lastTime = currentTime;
 
 		float fps = CalculateFPS();
-		printf("FPS: %f\n", fps);
+		//printf("FPS: %f\n", fps);
 
 		ProcessInput(this->window);
 
@@ -77,6 +77,7 @@ void Application::Initialization() {
 	scenes.push_back(new Scene(window));
 	scenes.push_back(new Scene(window));
 	scenes.push_back(new Scene(window));
+	scenes.push_back(new Scene(window));
 
 	callbacks = new Callbacks(window);
 
@@ -105,6 +106,13 @@ void Application::Initialization() {
 void Application::CreateModels() {
 
 	////---------------------------------------------------------------------------------------////
+	////                                    common textures                                    ////
+
+	Texture* grassTexture = new Texture("textures/grass.png", GL_TEXTURE0);
+	Texture* woodTexture = new Texture("textures/wooden_fence.png", GL_TEXTURE1);
+	Texture* skyTexture = new Texture("textures/posx.jpg", "textures/negx.jpg", "textures/posy.jpg", "textures/negy.jpg", "textures/posz.jpg", "textures/negz.jpg", GL_TEXTURE2);
+
+	////---------------------------------------------------------------------------------------////
 	////                                     common models                                     ////
 
 	ModelTree* modelTree = new ModelTree;
@@ -113,6 +121,11 @@ void Application::CreateModels() {
 	ModelSphere* modelSphere = new ModelSphere;
 	Model* modelPlane = new Model(plane);
 	Model* modelTriangle = new Model(triangle);
+
+	ModelTextured* modelPlaneUv = new ModelTextured(uv_plane);
+	ModelTextured* modelPlaneUv_sm = new ModelTextured(uv_plane_sm);
+
+	ModelSkyCube* modelSkyCube = new ModelSkyCube(skycube);
 
 	////---------------------------------------------------------------------------------------////
 	////                                   common materials                                    ////
@@ -123,6 +136,8 @@ void Application::CreateModels() {
 	Material* White = new Material(glm::vec3(1.f, 1.f, 1.f), glm::vec3(1.f, 1.f, 1.f), 32);
 	Material* def = new Material();
 	Material* Grey = new Material(glm::vec3(0.5, 0.5, 0.5), glm::vec3(0.3, 0.3, 0.3), 8);
+	Material* GreyShiny = new Material(glm::vec3(0.5, 0.5, 0.5), glm::vec3(0.3, 0.3, 0.3), 50);
+	Material* RedDull = new Material(glm::vec3(0.7f, 0.1f, 0.1f), glm::vec3(0.2f, 0.1f, 0.1f), 1);
 
 	TransformationBuilder transformationBuilder;
 	ShaderProgramBuilder shaderProgramBuilder;
@@ -134,6 +149,12 @@ void Application::CreateModels() {
 	ShaderProgram* lambert = shaderProgramBuilder.CREATE(LAMBERT).Build();
 	ShaderProgram* phong = shaderProgramBuilder.CREATE(PHONG).Build();
 	ShaderProgram* blinn = shaderProgramBuilder.CREATE(BLINN).Build();
+	ShaderProgram* constant_tex = shaderProgramBuilder.CREATE(CONSTANT_TEXTURE).Build();
+	ShaderProgram* blinn_tex = shaderProgramBuilder.CREATE(BLINN_TEXTURE).Build();
+	ShaderProgram* lambert_tex = shaderProgramBuilder.CREATE(LAMBERT_TEXTURE).Build();
+	ShaderProgram* phong_tex = shaderProgramBuilder.CREATE(PHONG_TEXTURE).Build();
+	ShaderProgram* skyShader = shaderProgramBuilder.CREATE(SKYCUBE).Build();
+	ShaderProgram* skyShaderDynamic = shaderProgramBuilder.CREATE(SKYCUBE_DYNAMIC).Build();
 
 	////---------------------------------------------------------------------------------------////
 	////                                     common lights                                     ////
@@ -144,7 +165,7 @@ void Application::CreateModels() {
 	Light* greenLight = new PointLight(glm::vec3(0.0, 1.0, 0.0));
 	Light* whiteLightReflector = new ReflectorLight(glm::vec3(1.0, 1.0, 1.0));
 	Light* sunLight = new DirectionLight(glm::vec3(.8f, .8f, .8f), glm::vec3(-0.0f, -1.0f, -0.0f));
-	Light* moonLight = new DirectionLight(glm::vec3(0.2, 0.2, 0.25), glm::vec3(-0.0f, -1.0f, -0.0f));
+	Light* moonLight = new DirectionLight(glm::vec3(0.1, 0.1, 0.2), glm::vec3(-0.0f, -1.0f, -0.0f));
 
 	////---------------------------------------------------------------------------------------////
 	////                               monkey solar system                                     ////
@@ -195,7 +216,9 @@ void Application::CreateModels() {
 	}
 
 	TransformationComposite* planeTransformation = transformationBuilder.SCALE(60).Build();
-	scenes[1]->AddDrawableModel(modelPlane, lambert, def, planeTransformation);
+	scenes[1]->AddDrawableModelTextured(modelPlaneUv, phong_tex, grassTexture, planeTransformation, def);
+
+	scenes[1]->AddDrawableSky(modelSkyCube, skyShaderDynamic, skyTexture);
 
 	TransformationComposite* bug1 = transformationBuilder
 		.TRANSLATE(0, 0, 0.005, true)
@@ -238,12 +261,12 @@ void Application::CreateModels() {
 	scenes[1]->AddDrawableLightModel(modelSuzi, constant, redLight, Red, bug2);
 	scenes[1]->AddDrawableLightModel(modelSuzi, constant, whiteLight, White, bug3);
 
-	//scenes[1]->AddLight(whiteLightReflector);
+	scenes[1]->AddLight(whiteLightReflector);
 
-	TransformationComposite* sun = transformationBuilder.ROTATE(0.1f, 0.0f, 0.0f, true).TRANSLATE(0, 60, 0).Build();
+	TransformationComposite* sun = transformationBuilder.ROTATE(0.1f, 0.0f, 0.0f, true).TRANSLATE(0, -60, 0).Build();
 	scenes[1]->AddDrawableLightModel(modelSphere,constant, sunLight, sun, White);
 
-	TransformationComposite* moon = transformationBuilder.ROTATE(0.1f, 0.0f, 0.0f, true).TRANSLATE(0, -60, 0).Build();
+	TransformationComposite* moon = transformationBuilder.ROTATE(0.1f, 0.0f, 0.0f, true).TRANSLATE(0, 60, 0).Build();
 	scenes[1]->AddDrawableLightModel(modelSphere, lambert, moonLight, moon, Grey);
 
 	////---------------------------------------------------------------------------------------////
@@ -270,7 +293,11 @@ void Application::CreateModels() {
 	////---------------------------------------------------------------------------------------////
 	////                                      triangle                                         ////
 
+	scenes[3]->AddDrawableSky(modelSkyCube, skyShader, skyTexture);
 	scenes[3]->AddDrawableModel(modelTriangle, constant, Blue);
+	scenes[3]->AddDrawableModelTextured(modelPlaneUv_sm, constant_tex, woodTexture, tc1);
+
+	scenes[3]->AddDrawableModelTextured(modelPlaneUv_sm, constant_tex, grassTexture, tc2);
 
 	////---------------------------------------------------------------------------------------////
 	////                                   all shaders                                         ////
@@ -319,6 +346,17 @@ void Application::CreateModels() {
 	//TransformationComposite* BallLightT3 = transformationBuilder.TRANSLATE(10, 10, 10).Build();
 	//scenes[5]->AddDrawableLightModel(modelSuzi, constant, redLight, BallLightT3, Red);
 
+
+	////---------------------------------------------------------------------------------------////
+	////                                 material spheres                                      ////
+
+	scenes[6]->AddDrawableModel(modelSphere, phong, tc1, Grey);
+	scenes[6]->AddDrawableModel(modelSphere, phong, tc2, GreyShiny);
+	scenes[6]->AddDrawableModel(modelSphere, phong, tc3, Red);
+	scenes[6]->AddDrawableModel(modelSphere, phong, tc4, RedDull);
+
+	scenes[6]->AddDrawableLightModel(modelSphere, constant, whiteLight, White, tclight);
+
 }
 
 void Application::MoveActiveCameraMouse(double x, double y) {
@@ -348,6 +386,10 @@ void Application::ToggleCursorLock() {
 		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 	else if (glfwGetInputMode(window, GLFW_CURSOR) == GLFW_CURSOR_NORMAL)
 		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+}
+
+void Application::SetShowSkyCube() {
+	scenes[activeScene]->ShowSkyCube();
 }
 
 void Application::SetMouseButtonDown(bool ADown) {

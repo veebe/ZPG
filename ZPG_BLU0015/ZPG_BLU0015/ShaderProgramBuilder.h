@@ -6,7 +6,13 @@ enum SHADERTYPES {
     CONSTANT,
     LAMBERT,
     PHONG,
-    BLINN
+    BLINN,
+    CONSTANT_TEXTURE,
+    PHONG_TEXTURE,
+    LAMBERT_TEXTURE,
+    BLINN_TEXTURE,
+    SKYCUBE,
+    SKYCUBE_DYNAMIC
 };
 
 class ShaderProgramBuilder {
