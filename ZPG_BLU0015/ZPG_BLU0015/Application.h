@@ -14,6 +14,7 @@
 #include "ModelSphere.h"
 #include "ModelTextured.h"
 #include "ModelSkyCube.h"
+#include "ModelObj.h"
 #include "Texture.h"
 
 #include "TransformationBuilder.h"

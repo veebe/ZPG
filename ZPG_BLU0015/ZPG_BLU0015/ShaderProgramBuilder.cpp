@@ -39,6 +39,9 @@ void ShaderProgramBuilder::CreateShader(SHADERTYPES AST) {
 	case SKYCUBE_DYNAMIC:
 		SP = new ShaderProgram("ShaderSky.vert", "ShaderSkyDynamic.frag");
 		break;
+	case STYLIZED:
+		SP = new ShaderProgram(AVertexShader, "ShaderStylized.frag");
+		break;
 	default:
 		break;
 	}

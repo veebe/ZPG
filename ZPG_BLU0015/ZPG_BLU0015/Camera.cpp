@@ -10,7 +10,7 @@ Camera::Camera() {
 }
 
 glm::mat4 Camera::GetProjectionMatrix() {
-	return glm::perspective(glm::radians(60.f), float(Width / Height), 0.1f, 100.0f);
+	return glm::perspective(glm::radians(60.f), float(Width / Height), 0.1f, 300.0f);
 }
 
 glm::mat4 Camera::GetViewMatrix() {

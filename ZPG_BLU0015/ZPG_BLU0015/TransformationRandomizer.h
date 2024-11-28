@@ -8,6 +8,7 @@
 class TransformationRandomizer {
 public:
     static TransformationComposite* CreateRandomTransformation();
+    static TransformationComposite* CreateRandomTransformationStars();
 
     static float RandomFloat(float min, float max);
 };

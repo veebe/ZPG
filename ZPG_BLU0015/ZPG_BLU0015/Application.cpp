@@ -111,6 +111,12 @@ void Application::CreateModels() {
 	Texture* grassTexture = new Texture("textures/grass.png", GL_TEXTURE0);
 	Texture* woodTexture = new Texture("textures/wooden_fence.png", GL_TEXTURE1);
 	Texture* skyTexture = new Texture("textures/posx.jpg", "textures/negx.jpg", "textures/posy.jpg", "textures/negy.jpg", "textures/posz.jpg", "textures/negz.jpg", GL_TEXTURE2);
+	Texture* houseTexture = new Texture("textures/house.png", GL_TEXTURE3);
+	Texture* catTexture = new Texture("textures/Cat_diffuse.jpg", GL_TEXTURE4);
+	Texture* utensilsTexture = new Texture("textures/UtensilsJar001_COL_3K.jpg", GL_TEXTURE5);
+	Texture* polkaTexture1 = new Texture("textures/polkadot1.png", GL_TEXTURE6);
+	Texture* polkaTexture2 = new Texture("textures/polkadot2.png", GL_TEXTURE7);
+	Texture* polkaTexture3 = new Texture("textures/polkadot3.jpg", GL_TEXTURE8);
 
 	////---------------------------------------------------------------------------------------////
 	////                                     common models                                     ////
@@ -125,7 +131,11 @@ void Application::CreateModels() {
 	ModelTextured* modelPlaneUv = new ModelTextured(uv_plane);
 	ModelTextured* modelPlaneUv_sm = new ModelTextured(uv_plane_sm);
 
-	ModelSkyCube* modelSkyCube = new ModelSkyCube(skycube);
+	Model* modelSkyCube = new ModelSkyCube(skycube);
+	Model* modelHouse = new ModelObj("models/house.obj");
+	Model* modelLogin = new ModelObj("models/login.obj");
+	Model* modelCat = new ModelObj("models/12221_Cat_v1_l3.obj");
+	Model* modelUtensils = new ModelObj("models/UtensilsJar001.obj");
 
 	////---------------------------------------------------------------------------------------////
 	////                                   common materials                                    ////
@@ -137,7 +147,7 @@ void Application::CreateModels() {
 	Material* def = new Material();
 	Material* Grey = new Material(glm::vec3(0.5, 0.5, 0.5), glm::vec3(0.3, 0.3, 0.3), 8);
 	Material* GreyShiny = new Material(glm::vec3(0.5, 0.5, 0.5), glm::vec3(0.3, 0.3, 0.3), 50);
-	Material* RedDull = new Material(glm::vec3(0.7f, 0.1f, 0.1f), glm::vec3(0.2f, 0.1f, 0.1f), 1);
+	Material* RedDull = new Material(glm::vec3(0.7f, 0.1f, 0.1f), glm::vec3(0.2f, 0.1f, 0.1f), 10);
 
 	TransformationBuilder transformationBuilder;
 	ShaderProgramBuilder shaderProgramBuilder;
@@ -155,6 +165,7 @@ void Application::CreateModels() {
 	ShaderProgram* phong_tex = shaderProgramBuilder.CREATE(PHONG_TEXTURE).Build();
 	ShaderProgram* skyShader = shaderProgramBuilder.CREATE(SKYCUBE).Build();
 	ShaderProgram* skyShaderDynamic = shaderProgramBuilder.CREATE(SKYCUBE_DYNAMIC).Build();
+	ShaderProgram* stylizedShader = shaderProgramBuilder.CREATE(STYLIZED).Build();
 
 	////---------------------------------------------------------------------------------------////
 	////                                     common lights                                     ////
@@ -178,7 +189,7 @@ void Application::CreateModels() {
 		.ROTATE(0.03f, 0.08f, 0.05f, true)
 		.SCALE(4.f)
 		.Build();
-	scenes[0]->AddDrawableModel(modelSuzi, phong, def, sun_t);
+	scenes[0]->AddDrawableModelTextured(modelSuzi, stylizedShader, polkaTexture3, sun_t, def);
 
 	TransformationComposite* earth_t = transformationBuilder
 		//.TRANSLATE(0, 0, 0.01, true)
@@ -213,6 +224,8 @@ void Application::CreateModels() {
 	{
 		scenes[1]->AddDrawableModel(modelTree, phong, TransformationRandomizer::CreateRandomTransformation());
 		scenes[1]->AddDrawableModel(modelBush, blinn, Green, TransformationRandomizer::CreateRandomTransformation());
+
+		scenes[1]->AddDrawableModel(modelSphere, constant, TransformationRandomizer::CreateRandomTransformationStars(), White);
 	}
 
 	TransformationComposite* planeTransformation = transformationBuilder.SCALE(60).Build();
@@ -268,6 +281,21 @@ void Application::CreateModels() {
 
 	TransformationComposite* moon = transformationBuilder.ROTATE(0.1f, 0.0f, 0.0f, true).TRANSLATE(0, 60, 0).Build();
 	scenes[1]->AddDrawableLightModel(modelSphere, lambert, moonLight, moon, Grey);
+
+	TransformationComposite* house_t = transformationBuilder.TRANSLATE(13, 0, -15).ROTATE(0, -45, 0).SCALE(1.3f).Build();
+	scenes[1]->AddDrawableModelTextured(modelHouse, lambert_tex, houseTexture, house_t);
+
+	TransformationComposite* login_t = transformationBuilder.ROTATE(.1, 1, 0.1, true).SCALE(.5f).Build();
+	scenes[1]->AddDrawableModelTextured(modelLogin, phong_tex, woodTexture, login_t);
+
+	TransformationComposite* cat1_t = transformationBuilder.ROTATE(-90, 0, 0).TRANSLATE(0,3,0).SCALE(0.02).Build();
+	scenes[1]->AddDrawableModelTextured(modelCat, lambert_tex, catTexture, cat1_t);
+
+	TransformationComposite* utensils_t = transformationBuilder.TRANSLATE(2, 0, -2).SCALE(2).Build();
+	scenes[1]->AddDrawableModelTextured(modelUtensils, phong_tex, utensilsTexture, utensils_t);
+
+	TransformationComposite* monk_t = transformationBuilder.TRANSLATE(10, 10, -10).SCALE(1.5).ROTATE(0,0.2,0,true).Build();
+	scenes[1]->AddDrawableModelTextured(modelSuzi, stylizedShader, polkaTexture3, monk_t);
 
 	////---------------------------------------------------------------------------------------////
 	////                                       spheres                                         ////

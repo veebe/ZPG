@@ -12,7 +12,8 @@ enum SHADERTYPES {
     LAMBERT_TEXTURE,
     BLINN_TEXTURE,
     SKYCUBE,
-    SKYCUBE_DYNAMIC
+    SKYCUBE_DYNAMIC,
+    STYLIZED
 };
 
 class ShaderProgramBuilder {
