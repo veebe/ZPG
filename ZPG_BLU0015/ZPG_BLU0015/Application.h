@@ -26,6 +26,8 @@
 #include "LightDirection.h"
 #include "ShaderProgramBuilder.h"
 
+#include "ClickModeType.h"
+
 class Application {
 public:
     void Run();
@@ -38,6 +40,7 @@ public:
 	void MoveActiveCameraMouse(double x, double y);
 	void MoveActiveCamera(Direction Adirection, double ADeltaTime);
 	void SetMouseButtonDown(bool ADown);
+	void ChangeClickMode();
 
 	void ResizeWindow(int w, int h);
 
@@ -60,7 +63,12 @@ private:
 	double lastX = 0.0f;
 	double lastY = 0.0f;
 
+	double CursorX = 0.0f;
+	double CursorY = 0.0f;
+	int windowh = 600;
 
 	double lastTime = 0.0f;
 	double deltaTime = 0.0f;
+
+	ClickMode mode = INSERT;
 };

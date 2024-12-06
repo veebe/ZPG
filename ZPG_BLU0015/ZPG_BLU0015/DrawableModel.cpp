@@ -4,6 +4,15 @@
 DrawableModel::DrawableModel(Model* Amodel, ShaderProgram* ASP, TransformationComposite* ATransformation, Material* AMaterial)
 			  :DrawableObject(ATransformation), model(Amodel), shaderprogram(ASP), material(AMaterial) {};
 
+
+DrawableModel::DrawableModel(const DrawableModel& ADrawableModel)
+			:DrawableObject(ADrawableModel.transformation), model(ADrawableModel.model), shaderprogram(ADrawableModel.shaderprogram), material(ADrawableModel.material) {
+}
+
+DrawableModel* DrawableModel::clone() const {
+	return new DrawableModel(*this);
+}
+
 void DrawableModel::DrawObject() {
 	this->shaderprogram->UseShader();
 	this->shaderprogram->ApplyMaterial(this->material);

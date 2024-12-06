@@ -7,6 +7,8 @@ void Application::Run() {
 	scenes[activeScene]->ApplyLight();
 
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_STENCIL_TEST);
+	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 	while (!glfwWindowShouldClose(window)) {
 		double currentTime = glfwGetTime();
 		deltaTime = currentTime - lastTime;
@@ -217,6 +219,8 @@ void Application::CreateModels() {
 		.Build();
 	scenes[0]->AddDrawableModel(modelSuzi, constant, def, moon_of_moon_t);
 
+	scenes[0]->SetInsertableModel(new DrawableModel(modelSuzi, lambert, moon_of_moon_t, def));
+
 	////---------------------------------------------------------------------------------------////
 	////                                       forest                                          ////
 
@@ -297,6 +301,8 @@ void Application::CreateModels() {
 	TransformationComposite* monk_t = transformationBuilder.TRANSLATE(10, 10, -10).SCALE(1.5).ROTATE(0,0.2,0,true).Build();
 	scenes[1]->AddDrawableModelTextured(modelSuzi, stylizedShader, polkaTexture3, monk_t);
 
+	scenes[1]->SetInsertableModel(new DrawableModel(modelSuzi, lambert, moon_of_moon_t, def));
+
 	////---------------------------------------------------------------------------------------////
 	////                                       spheres                                         ////
 
@@ -317,6 +323,7 @@ void Application::CreateModels() {
 	scenes[2]->AddDrawableLightModel(modelSphere, constant, redLight, Red, tclight2);
 	
 	scenes[2]->AddLight(whiteLightReflector);
+	scenes[2]->SetInsertableModel(new DrawableModel(modelSuzi, lambert, moon_of_moon_t, def));
 
 	////---------------------------------------------------------------------------------------////
 	////                                      triangle                                         ////
@@ -326,7 +333,8 @@ void Application::CreateModels() {
 	scenes[3]->AddDrawableModelTextured(modelPlaneUv_sm, constant_tex, woodTexture, tc1);
 
 	scenes[3]->AddDrawableModelTextured(modelPlaneUv_sm, constant_tex, grassTexture, tc2);
-
+	
+	scenes[3]->SetInsertableModel(new DrawableModel(modelSuzi, lambert, moon_of_moon_t, def));
 	////---------------------------------------------------------------------------------------////
 	////                                   all shaders                                         ////
 
@@ -342,6 +350,8 @@ void Application::CreateModels() {
 
 	scenes[4]->AddDrawableLightModel(modelSphere, constant, whiteLight, White, transformationBuilder.SCALE(0.2f).TRANSLATE(10,5,0).Build());
 	scenes[4]->AddLight(sunLight);
+
+	scenes[4]->SetInsertableModel(new DrawableModel(modelSuzi, lambert, moon_of_moon_t, def));
 
 	////---------------------------------------------------------------------------------------////
 	////                                      gravity                                          ////
@@ -373,7 +383,7 @@ void Application::CreateModels() {
 
 	//TransformationComposite* BallLightT3 = transformationBuilder.TRANSLATE(10, 10, 10).Build();
 	//scenes[5]->AddDrawableLightModel(modelSuzi, constant, redLight, BallLightT3, Red);
-
+	scenes[5]->SetInsertableModel(new DrawableModel(modelSuzi, lambert, moon_of_moon_t, def));
 
 	////---------------------------------------------------------------------------------------////
 	////                                 material spheres                                      ////
@@ -384,7 +394,7 @@ void Application::CreateModels() {
 	scenes[6]->AddDrawableModel(modelSphere, phong, tc4, RedDull);
 
 	scenes[6]->AddDrawableLightModel(modelSphere, constant, whiteLight, White, tclight);
-
+	scenes[6]->SetInsertableModel(new DrawableModel(modelSuzi, lambert, moon_of_moon_t, def));
 }
 
 void Application::MoveActiveCameraMouse(double x, double y) {
@@ -403,6 +413,8 @@ void Application::MoveActiveCameraMouse(double x, double y) {
 	}
 	else
 		this->firstMouse = true;
+	CursorX = x;
+	CursorY = y;
 }
 
 void Application::MoveActiveCamera(Direction Adirection, double ADeltaTime) {
@@ -422,6 +434,33 @@ void Application::SetShowSkyCube() {
 
 void Application::SetMouseButtonDown(bool ADown) {
 	this->MouseButtonDown = ADown;
+
+	if (ADown){
+		GLbyte color[4];
+		GLfloat depth;
+		GLuint index;
+
+		GLint x = (GLint)CursorX;
+		GLint y = (GLint)CursorY;
+
+		int newy = windowh - CursorY;
+
+		glReadPixels(x, newy, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, color);
+		glReadPixels(x, newy, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth);
+		glReadPixels(x, newy, 1, 1, GL_STENCIL_INDEX, GL_UNSIGNED_INT, &index);
+
+		printf("Clicked on pixel %d, %d, color %02hhx%02hhx%02hhx%02hhx, depth %f, stencil index % u\n", x, y, color[0], color[1], color[2], color[3], depth, index);
+	 
+		glm::vec3 screenX = glm::vec3(x, newy, depth);
+	/*	glm::mat4 view;
+		glm::mat4 projection;
+		glm::vec4 viewPort = glm::vec4(0, 0, getResolution().x, getResolution().y);
+		glm::vec3 pos = glm::unProject(screenX, view, projection, viewPort);
+		*/
+		//printf("unProject [%f,%f,%f]\n", pos.x, pos.y, pos.z);
+
+		scenes[activeScene]->Clicked(mode, index, screenX);
+	}
 }
 
 Application& Application::getInstance()
@@ -431,10 +470,20 @@ Application& Application::getInstance()
 }
 
 void Application::ResizeWindow(int w, int h) {
+	windowh = h;
 	for (auto s : scenes)
 	{
 		s->ResizeWindow(w, h);
 	}
+}
+
+void Application::ChangeClickMode() {
+	if (mode == INSERT)
+		mode = DELETE;
+	else if (mode == DELETE)
+		mode = MOVE;
+	else if (mode == MOVE)
+		mode = INSERT;
 }
 
 float Application::CalculateFPS() {

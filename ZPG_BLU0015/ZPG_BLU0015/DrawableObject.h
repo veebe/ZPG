@@ -17,6 +17,8 @@ public:
 	virtual void ApplyLight(Light* ALight) = 0;
 	virtual void ApplyCamera(Camera* ACamera) = 0;
 	virtual void ClearLights() = 0;
+
+	void SetNewTransformation(TransformationComposite* ATC);
 protected:
 	TransformationComposite* transformation;
 };

@@ -1,5 +1,6 @@
 #include "Callbacks.h"
 #include "Application.h"
+#include "ClickModeType.h"
 
 Callbacks::Callbacks(GLFWwindow* window) {
 
@@ -52,11 +53,11 @@ void Callbacks::key_callback(GLFWwindow* window, int key, int scancode, int acti
 		
 		Application::getInstance().MoveActiveCamera(LEFT, Application::getInstance().GetDeltaTime());
 	}
-
-	if (key == GLFW_KEY_D ) {
-	
-		Application::getInstance().MoveActiveCamera(RIGHT, Application::getInstance().GetDeltaTime());
-	}*/
+	*/
+	if (key == GLFW_KEY_I ) {
+		
+		Application::getInstance().ChangeClickMode();
+	}
 
 	if (key == GLFW_KEY_R && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
 		//Application::getInstance().SpinSceneObject(0, 0, 1, 0);

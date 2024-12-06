@@ -19,9 +19,10 @@
 #include "TransformationTranslate.h"
 #include "Light.h"
 #include "LightReflector.h"
+#include "ClickModeType.h"
+#include "ShaderProgramBuilder.h"
 
 using namespace std;
-
 
 class Scene {
 public:
@@ -42,18 +43,30 @@ public:
     void ResizeWindow(int w, int h);
     void ShowSkyCube();
 
+    void Clicked(ClickMode Amode, int AStencilId, glm::vec3 AscreenX);
+    void SetInsertableModel(DrawableModel *AObject);
+
     void ApplyCamera();
     void ClearLight();
     void ApplyLight();
+
+   
 private:
+    void DeleteModel(int AStendilId);
+    //void MoveModel(int AStendilId);
+    //void InsertModel(int AStendilId);
+
     TransformationComposite* GetTransformation(TransformationComposite* ATransformation);
     Material* GetMaterial(Material* AMaterial);
 
     GLFWwindow* window;
     vector<DrawableObject*> drawableObjects;
+    DrawableModel* InsetableObject;
     DrawableModelTextured* drawableSky;
     Camera* camera;
     vector<Light*> lights;
 
     bool showSkyCube = false;
+    bool firstMove = true;
+    int movingObject = 0;
 };

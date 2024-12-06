@@ -31,6 +31,11 @@ void Camera::ResizeWindow(int w, int h) {
 	Notify(PROJECTIONMATRIX);
 }
 
+glm::vec3 Camera::CalculateClickedPos(glm::vec3 AscreenX) {
+	glm::vec4 viewPort = glm::vec4(0, 0, Width, Height);
+	return glm::unProject(AscreenX, GetViewMatrix(), GetProjectionMatrix(), viewPort);
+}
+
 void Camera::MoveCameraWithMouse(double xoffset, double yoffset) {
 
 	float sensitivity;

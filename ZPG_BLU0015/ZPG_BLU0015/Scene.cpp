@@ -1,4 +1,5 @@
 #include "Scene.h"
+#include "ModelSuzi.h"
 
 Scene::Scene(GLFWwindow* window){
     this->window = window;
@@ -56,21 +57,86 @@ void Scene::AddLight(Light* ALight) {
     
 void Scene::Draw() {
 	
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 	if (this->drawableSky){
 		glDepthMask(GL_FALSE);
 		this->drawableSky->DrawObject();
 		glDepthMask(GL_TRUE);
 	}
+	int a = 1;
 	for (auto* dro : drawableObjects)
 	{
+		glStencilFunc(GL_ALWAYS, a, 0xFF);
 		dro->DrawObject();
+		a++;
 	}
 	glfwPollEvents();
 	glfwSwapBuffers(window);
 
 };
+
+void Scene::SetInsertableModel(DrawableModel* AObject) {
+	this->InsetableObject = AObject;
+}
+
+void Scene::Clicked(ClickMode Amode, int AStencilId, glm::vec3 AscreenX) {
+	switch (Amode)
+	{
+	case INSERT:
+		{
+			glm::vec3 pos = this->camera->CalculateClickedPos(AscreenX);
+
+			TransformationComposite* ltc = new  TransformationComposite();
+			ltc->AddTransformation(new TransformationTranslate(pos.x, pos.y, pos.z));
+			InsetableObject->SetNewTransformation(ltc);
+
+			drawableObjects.push_back(InsetableObject->clone());
+
+			ClearLight();
+			ApplyCamera();
+			ApplyLight();
+
+			break;
+		}
+	case DELETE:
+		{
+			if (AStencilId > 0)
+				DeleteModel(AStencilId);
+			break;
+		}
+	case MOVE:
+		{
+			if (firstMove){
+				movingObject = AStencilId;
+				firstMove = !firstMove;
+			}
+			else
+			{
+				glm::vec3 pos = this->camera->CalculateClickedPos(AscreenX);
+
+				TransformationComposite* ltc = new  TransformationComposite();
+				ltc->AddTransformation(new TransformationTranslate(pos.x, pos.y, pos.z));
+
+				drawableObjects[movingObject -1]->SetNewTransformation(ltc);
+
+				movingObject = 0;
+				firstMove = !firstMove;
+			}
+		}
+		break;
+	default:
+		break;
+	}
+
+	
+	//printf("unProject [%f,%f,%f]\n", pos.x, pos.y, pos.z);
+}
+
+void Scene::DeleteModel(int AStendilId) {
+	drawableObjects.erase(drawableObjects.begin() + AStendilId - 1);
+}
+
 
 void Scene::MoveActiveCamera(double x, double y) {
 	camera->MoveCameraWithMouse(x, y);
