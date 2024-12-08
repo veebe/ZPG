@@ -1,4 +1,5 @@
 #pragma once
+/* Vratislav Blunar - BLU0015 */
 #include "IObserver.h"
 #include "ObserverTypes.h"
 

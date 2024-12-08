@@ -1,5 +1,5 @@
 #pragma once
-
+/* Vratislav Blunar - BLU0015 */
 #include <vector>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>  
@@ -40,6 +40,7 @@ public:
 	void MoveActiveCameraMouse(double x, double y);
 	void MoveActiveCamera(Direction Adirection, double ADeltaTime);
 	void SetMouseButtonDown(bool ADown);
+	void ClickAction();
 	void ChangeClickMode();
 
 	void ResizeWindow(int w, int h);

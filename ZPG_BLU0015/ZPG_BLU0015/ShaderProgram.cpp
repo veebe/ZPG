@@ -1,3 +1,4 @@
+/* Vratislav Blunar - BLU0015 */
 #include "ShaderProgram.h"
 
 ShaderProgram::ShaderProgram(const GLchar* AVertexShader, const GLchar* AFragmentShader, bool AisFile) {

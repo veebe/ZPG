@@ -1,3 +1,4 @@
+/* Vratislav Blunar - BLU0015 */
 #include "ModelSkyCube.h"
 
 ModelSkyCube::ModelSkyCube(std::vector<float> AModel) {

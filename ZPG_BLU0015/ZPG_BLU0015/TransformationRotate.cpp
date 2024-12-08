@@ -1,3 +1,4 @@
+/* Vratislav Blunar - BLU0015 */
 #include "TransformationRotate.h"
 
 TransformationRotate::TransformationRotate(float x, float y, float z, bool ARepeat)  {

@@ -1,3 +1,4 @@
+/* Vratislav Blunar - BLU0015 */
 #include "TransformationRandomizer.h"
 
 float TransformationRandomizer::RandomFloat(float min, float max) {
@@ -10,7 +11,7 @@ float TransformationRandomizer::RandomFloat(float min, float max) {
 TransformationComposite* TransformationRandomizer::CreateRandomTransformation() {
     TransformationComposite* transformation = new TransformationComposite();
 
-    float randomScale =  RandomFloat(0.5f, 3.f);
+    float randomScale =  RandomFloat(0.1f, 0.4f);
     float randomRotationX = RandomFloat(-7.f, 7.f);
     float randomRotationY = RandomFloat(0.f, 360.f);
     float randomRotationZ = RandomFloat(-7.f, 7.f);
@@ -22,6 +23,29 @@ TransformationComposite* TransformationRandomizer::CreateRandomTransformation() 
     }
     float randomTranslateY = 0;
         
+
+    transformation->AddTransformation(new TransformationTranslate(randomTranslateX, randomTranslateY, randomTranslateZ));
+    transformation->AddTransformation(new TransformationScale(randomScale));
+    transformation->AddTransformation(new TransformationRotate(randomRotationX, randomRotationY, randomRotationZ));
+
+    return transformation;
+}
+
+TransformationComposite* TransformationRandomizer::CreateRandomTransformationGrass() {
+    TransformationComposite* transformation = new TransformationComposite();
+
+    float randomScale = RandomFloat(1.f, 3.f);
+    float randomRotationX = RandomFloat(-7.f, 7.f);
+    float randomRotationY = RandomFloat(0.f, 360.f);
+    float randomRotationZ = RandomFloat(-7.f, 7.f);
+    float randomTranslateX = 15;
+    float randomTranslateZ = -15;
+    while (randomTranslateX > -5 && randomTranslateX < 30 && randomTranslateZ > -35 && randomTranslateZ < 5) {
+        randomTranslateX = RandomFloat(-50.f, 50.f);
+        randomTranslateZ = RandomFloat(-50.f, 50.f);
+    }
+    float randomTranslateY = 0;
+
 
     transformation->AddTransformation(new TransformationTranslate(randomTranslateX, randomTranslateY, randomTranslateZ));
     transformation->AddTransformation(new TransformationScale(randomScale));

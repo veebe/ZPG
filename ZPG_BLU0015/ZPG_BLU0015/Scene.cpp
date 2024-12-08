@@ -1,5 +1,5 @@
+/* Vratislav Blunar - BLU0015 */
 #include "Scene.h"
-#include "ModelSuzi.h"
 
 Scene::Scene(GLFWwindow* window){
     this->window = window;

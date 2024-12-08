@@ -1,3 +1,4 @@
+/* Vratislav Blunar - BLU0015 */
 #include "ModelSuzi.h"
 
 ModelSuzi::ModelSuzi() {

@@ -1,4 +1,5 @@
 #version 450
+/* Vratislav Blunar - BLU0015 */
 layout(location = 0) in vec3 vp;
 
 uniform mat4 viewMatrix;

@@ -1,4 +1,5 @@
 #version 330
+/* Vratislav Blunar - BLU0015 */
 layout(location=0) in vec3 vp;               
 layout(location=1) in vec3 vn;
 layout(location=2) in vec2 vt;

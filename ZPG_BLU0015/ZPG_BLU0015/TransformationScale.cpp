@@ -1,3 +1,4 @@
+/* Vratislav Blunar - BLU0015 */
 #include "TransformationScale.h"
 
 TransformationScale::TransformationScale(float scale) {

@@ -1,3 +1,4 @@
+/* Vratislav Blunar - BLU0015 */
 #include "DrawableLight.h"
 
 DrawableLight::DrawableLight(Light* ALight, TransformationComposite* ATransformation) 

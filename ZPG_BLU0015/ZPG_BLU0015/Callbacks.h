@@ -1,12 +1,9 @@
 #pragma once
-
+/* Vratislav Blunar - BLU0015 */
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>  
 #include <stdlib.h>
 #include <stdio.h>
-//#include "Scene.h"
-
-//#include "Camera.h"
 
 class Application;
 

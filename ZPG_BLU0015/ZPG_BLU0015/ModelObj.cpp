@@ -1,3 +1,4 @@
+/* Vratislav Blunar - BLU0015 */
 #include "ModelObj.h"
 
 ModelObj::ModelObj(std::string AModelFile) {

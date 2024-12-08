@@ -1,5 +1,5 @@
-﻿#include "Application.h"
-
+﻿/* Vratislav Blunar - BLU0015 */
+#include "Application.h"
 
 int main(void)
 {

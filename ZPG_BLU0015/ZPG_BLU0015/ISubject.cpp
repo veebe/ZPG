@@ -1,3 +1,4 @@
+/* Vratislav Blunar - BLU0015 */
 #include "ISubject.h"
 
 void ISubject::Attach(IObserver* Aobserver) {

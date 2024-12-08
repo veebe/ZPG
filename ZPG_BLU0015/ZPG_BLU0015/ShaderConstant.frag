@@ -1,4 +1,5 @@
 #version 330
+/* Vratislav Blunar - BLU0015 */
 out vec4 frag_colour;
 
 uniform vec3 objectColor;

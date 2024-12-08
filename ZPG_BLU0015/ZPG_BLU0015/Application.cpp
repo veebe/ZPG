@@ -1,3 +1,4 @@
+/* Vratislav Blunar - BLU0015 */
 #include "Application.h"
 
 #include "OtherModels.h"
@@ -80,6 +81,7 @@ void Application::Initialization() {
 	scenes.push_back(new Scene(window));
 	scenes.push_back(new Scene(window));
 	scenes.push_back(new Scene(window));
+	scenes.push_back(new Scene(window));
 
 	callbacks = new Callbacks(window);
 
@@ -119,6 +121,7 @@ void Application::CreateModels() {
 	Texture* polkaTexture1 = new Texture("textures/polkadot1.png", GL_TEXTURE6);
 	Texture* polkaTexture2 = new Texture("textures/polkadot2.png", GL_TEXTURE7);
 	Texture* polkaTexture3 = new Texture("textures/polkadot3.jpg", GL_TEXTURE8);
+	Texture* treeTexture = new Texture("textures/tree.png", GL_TEXTURE9);
 
 	////---------------------------------------------------------------------------------------////
 	////                                     common models                                     ////
@@ -138,6 +141,7 @@ void Application::CreateModels() {
 	Model* modelLogin = new ModelObj("models/login.obj");
 	Model* modelCat = new ModelObj("models/12221_Cat_v1_l3.obj");
 	Model* modelUtensils = new ModelObj("models/UtensilsJar001.obj");
+	Model* modelTreeTex = new ModelObj("models/tree.obj");
 
 	////---------------------------------------------------------------------------------------////
 	////                                   common materials                                    ////
@@ -145,6 +149,7 @@ void Application::CreateModels() {
 	Material* Blue = new Material(glm::vec3(0.1f, 0.1f, 0.7f), glm::vec3(0.1f, 0.1f, 0.2f), 32);
 	Material* Red = new Material(glm::vec3(0.7f, 0.1f, 0.1f), glm::vec3(0.2f, 0.1f, 0.1f), 32);
 	Material* Green = new Material(glm::vec3(0.1f, 0.7f, 0.1f), glm::vec3(0.1f, 0.2f, 0.1f), 32);
+	Material* Yellow = new Material(glm::vec3(0.8f, 0.8f, 0.1f), glm::vec3(0.1f, 0.2f, 0.1f), 32);
 	Material* White = new Material(glm::vec3(1.f, 1.f, 1.f), glm::vec3(1.f, 1.f, 1.f), 32);
 	Material* def = new Material();
 	Material* Grey = new Material(glm::vec3(0.5, 0.5, 0.5), glm::vec3(0.3, 0.3, 0.3), 8);
@@ -226,8 +231,9 @@ void Application::CreateModels() {
 
 	for (int i = 0; i < 100; i++)
 	{
-		scenes[1]->AddDrawableModel(modelTree, phong, TransformationRandomizer::CreateRandomTransformation());
-		scenes[1]->AddDrawableModel(modelBush, blinn, Green, TransformationRandomizer::CreateRandomTransformation());
+		//scenes[1]->AddDrawableModel(modelTree, phong, TransformationRandomizer::CreateRandomTransformation());
+		scenes[1]->AddDrawableModelTextured(modelTreeTex, lambert_tex, treeTexture, TransformationRandomizer::CreateRandomTransformation());
+		scenes[1]->AddDrawableModel(modelBush, blinn, Green, TransformationRandomizer::CreateRandomTransformationGrass());
 
 		scenes[1]->AddDrawableModel(modelSphere, constant, TransformationRandomizer::CreateRandomTransformationStars(), White);
 	}
@@ -395,6 +401,80 @@ void Application::CreateModels() {
 
 	scenes[6]->AddDrawableLightModel(modelSphere, constant, whiteLight, White, tclight);
 	scenes[6]->SetInsertableModel(new DrawableModel(modelSuzi, lambert, moon_of_moon_t, def));
+
+	////---------------------------------------------------------------------------------------////
+	////                                bezier transformation                                  ////
+
+	glm::vec3 P0 = glm::vec3(0.0f, 10.0f, 0.0f);
+	glm::vec3 P1 = glm::vec3(5.0f, 20.0f, 0.0f);
+	glm::vec3 P2 = glm::vec3(10.0f, 0.0f, 0.0f);
+	glm::vec3 P3 = glm::vec3(15.0f, 10.0f, 0.0f);
+
+	TransformationComposite* BezierTransformation = transformationBuilder.BEZIER(P0, P1, P2, P3).Build();
+	TransformationComposite* LineTransformation1 = transformationBuilder.LINE(P0, P1).SCALE(0.1f).Build();
+	TransformationComposite* LineTransformation2 = transformationBuilder.LINE(P1, P2).SCALE(0.1f).Build();
+	TransformationComposite* LineTransformation3 = transformationBuilder.LINE(P2, P3).SCALE(0.1f).Build();
+	
+	TransformationComposite* DotTransformation1 = transformationBuilder.TRANSLATE(P0).SCALE(0.2f).Build();
+	TransformationComposite* DotTransformation2 = transformationBuilder.TRANSLATE(P1).SCALE(0.2f).Build();
+	TransformationComposite* DotTransformation3 = transformationBuilder.TRANSLATE(P2).SCALE(0.2f).Build();
+	TransformationComposite* DotTransformation4 = transformationBuilder.TRANSLATE(P3).SCALE(0.2f).Build();
+
+	scenes[7]->AddDrawableLightModel(modelTriangle, constant, redLight, BezierTransformation, Red);
+	
+	scenes[7]->AddDrawableModel(modelSphere, constant, Green, DotTransformation1);
+	scenes[7]->AddDrawableModel(modelSphere, constant, Green, DotTransformation2);
+	scenes[7]->AddDrawableModel(modelSphere, constant, Green, DotTransformation3);
+	scenes[7]->AddDrawableModel(modelSphere, constant, Green, DotTransformation4);
+
+
+	scenes[7]->AddDrawableModel(modelSphere, constant, White, LineTransformation1);
+	scenes[7]->AddDrawableModel(modelSphere, constant, White, LineTransformation2);
+	scenes[7]->AddDrawableModel(modelSphere, constant, White, LineTransformation3);
+
+	glm::vec3 start = glm::vec3(-10.0f, 5.0f, 0.0f);
+	glm::vec3 end = glm::vec3(-20.0f, -5.0f, 0.0f);
+	std::vector<glm::vec3> controlPoints = {
+		glm::vec3(0.0f, -5.0f, 0.0f),
+		glm::vec3(-3.0f, -5.0f, 0.0f),
+		glm::vec3(-15.0f, 0.0f, 5.0f),
+		glm::vec3(-6.0f, -8.0f, 8.0f),
+		glm::vec3(-18.0f, -7.0f, 10.0f)
+	};
+	TransformationComposite* BezierCurveT = transformationBuilder.BEZIER(start, end, controlPoints).Build();
+
+	TransformationComposite* BezierCurveLine1 = transformationBuilder.LINE(start, controlPoints[0]).SCALE(0.1f).Build();
+	TransformationComposite* BezierCurveLine2 = transformationBuilder.LINE(controlPoints[0], controlPoints[1]).SCALE(0.1f).Build();
+	TransformationComposite* BezierCurveLine3 = transformationBuilder.LINE(controlPoints[1], controlPoints[2]).SCALE(0.1f).Build();
+	TransformationComposite* BezierCurveLine4 = transformationBuilder.LINE(controlPoints[2], controlPoints[3]).SCALE(0.1f).Build();
+	TransformationComposite* BezierCurveLine5 = transformationBuilder.LINE(controlPoints[3], controlPoints[4]).SCALE(0.1f).Build();
+	TransformationComposite* BezierCurveLine6 = transformationBuilder.LINE(controlPoints[4], end).SCALE(0.1f).Build();
+
+	TransformationComposite* BezierCurveDot1 = transformationBuilder.TRANSLATE(start).SCALE(0.2f).Build();
+	TransformationComposite* BezierCurveDot2 = transformationBuilder.TRANSLATE(controlPoints[0]).SCALE(0.2f).Build();
+	TransformationComposite* BezierCurveDot3 = transformationBuilder.TRANSLATE(controlPoints[1]).SCALE(0.2f).Build();
+	TransformationComposite* BezierCurveDot4 = transformationBuilder.TRANSLATE(controlPoints[2]).SCALE(0.2f).Build();
+	TransformationComposite* BezierCurveDot5 = transformationBuilder.TRANSLATE(controlPoints[3]).SCALE(0.2f).Build();
+	TransformationComposite* BezierCurveDot6 = transformationBuilder.TRANSLATE(controlPoints[4]).SCALE(0.2f).Build();
+	TransformationComposite* BezierCurveDot7 = transformationBuilder.TRANSLATE(end).SCALE(0.2f).Build();
+
+	scenes[7]->AddDrawableLightModel(modelTriangle, constant, redLight, BezierCurveT, Red);
+
+	scenes[7]->AddDrawableModel(modelSphere, constant, Yellow, BezierCurveDot1);
+	scenes[7]->AddDrawableModel(modelSphere, constant, Blue, BezierCurveDot2);
+	scenes[7]->AddDrawableModel(modelSphere, constant, Blue, BezierCurveDot3);
+	scenes[7]->AddDrawableModel(modelSphere, constant, Blue, BezierCurveDot4);
+	scenes[7]->AddDrawableModel(modelSphere, constant, Blue, BezierCurveDot5);
+	scenes[7]->AddDrawableModel(modelSphere, constant, Blue, BezierCurveDot6);
+	scenes[7]->AddDrawableModel(modelSphere, constant, Yellow, BezierCurveDot7);
+
+	scenes[7]->AddDrawableModel(modelSphere, constant, White, BezierCurveLine1);
+	scenes[7]->AddDrawableModel(modelSphere, constant, White, BezierCurveLine2);
+	scenes[7]->AddDrawableModel(modelSphere, constant, White, BezierCurveLine3);
+	scenes[7]->AddDrawableModel(modelSphere, constant, White, BezierCurveLine4);
+	scenes[7]->AddDrawableModel(modelSphere, constant, White, BezierCurveLine5);
+	scenes[7]->AddDrawableModel(modelSphere, constant, White, BezierCurveLine6);
+
 }
 
 void Application::MoveActiveCameraMouse(double x, double y) {
@@ -432,35 +512,28 @@ void Application::SetShowSkyCube() {
 	scenes[activeScene]->ShowSkyCube();
 }
 
+void Application::ClickAction() {
+	GLbyte color[4];
+	GLfloat depth;
+	GLuint index;
+
+	GLint x = (GLint)CursorX;
+	GLint y = (GLint)CursorY;
+
+	int newy = windowh - CursorY;
+
+	glReadPixels(x, newy, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, color);
+	glReadPixels(x, newy, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth);
+	glReadPixels(x, newy, 1, 1, GL_STENCIL_INDEX, GL_UNSIGNED_INT, &index);
+
+	printf("Clicked on pixel %d, %d, color %02hhx%02hhx%02hhx%02hhx, depth %f, stencil index % u\n", x, y, color[0], color[1], color[2], color[3], depth, index);
+
+	glm::vec3 screenX = glm::vec3(x, newy, depth);
+	scenes[activeScene]->Clicked(mode, index, screenX);
+}
+
 void Application::SetMouseButtonDown(bool ADown) {
 	this->MouseButtonDown = ADown;
-
-	if (ADown){
-		GLbyte color[4];
-		GLfloat depth;
-		GLuint index;
-
-		GLint x = (GLint)CursorX;
-		GLint y = (GLint)CursorY;
-
-		int newy = windowh - CursorY;
-
-		glReadPixels(x, newy, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, color);
-		glReadPixels(x, newy, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth);
-		glReadPixels(x, newy, 1, 1, GL_STENCIL_INDEX, GL_UNSIGNED_INT, &index);
-
-		printf("Clicked on pixel %d, %d, color %02hhx%02hhx%02hhx%02hhx, depth %f, stencil index % u\n", x, y, color[0], color[1], color[2], color[3], depth, index);
-	 
-		glm::vec3 screenX = glm::vec3(x, newy, depth);
-	/*	glm::mat4 view;
-		glm::mat4 projection;
-		glm::vec4 viewPort = glm::vec4(0, 0, getResolution().x, getResolution().y);
-		glm::vec3 pos = glm::unProject(screenX, view, projection, viewPort);
-		*/
-		//printf("unProject [%f,%f,%f]\n", pos.x, pos.y, pos.z);
-
-		scenes[activeScene]->Clicked(mode, index, screenX);
-	}
 }
 
 Application& Application::getInstance()

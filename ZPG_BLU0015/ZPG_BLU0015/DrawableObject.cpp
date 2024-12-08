@@ -1,3 +1,4 @@
+/* Vratislav Blunar - BLU0015 */
 #include "DrawableObject.h"
 
 DrawableObject::DrawableObject(TransformationComposite* ATransformation): transformation(ATransformation) {};

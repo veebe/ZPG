@@ -1,4 +1,5 @@
 #version 450
+/* Vratislav Blunar - BLU0015 */
 in vec3 fragmentLocalPosition;
 uniform samplerCube UISky;
 

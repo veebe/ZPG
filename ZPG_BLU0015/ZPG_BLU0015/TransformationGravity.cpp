@@ -1,3 +1,4 @@
+/* Vratislav Blunar - BLU0015 */
 #include "TransformationGravity.h"
 #include "Application.h"
 

@@ -1,3 +1,4 @@
+/* Vratislav Blunar - BLU0015 */
 #include "DrawableLightModel.h"
 
 DrawableLightModel::DrawableLightModel(Model* AModel, ShaderProgram* ASP, TransformationComposite* ATransformation, Material* AMaterial, Light* ALight)

@@ -1,3 +1,4 @@
+/* Vratislav Blunar - BLU0015 */
 #include "Texture.h"
 
 Texture::Texture() {

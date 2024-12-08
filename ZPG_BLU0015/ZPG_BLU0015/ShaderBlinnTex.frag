@@ -1,4 +1,5 @@
 #version 330
+/* Vratislav Blunar - BLU0015 */
 in vec4 ex_worldPosition;
 in vec3 ex_worldNormal;
 in vec2 vt_out;
@@ -50,11 +51,9 @@ void main() {
 
         float dimming = 1.0 / (1.0 + (fdistance / lights[i].strength));
 
-        // Diffuse component
         float diff = max(dot(normal, lightVector), 0.0);
         vec3 diffuse = diff * lights[i].color;
 
-        // Specular component
         vec3 halfwayDir = normalize(lightVector + viewDir);
         float spec = pow(max(dot(normal, halfwayDir), 0.0), shininess);
         vec3 specular = spec * lights[i].color;

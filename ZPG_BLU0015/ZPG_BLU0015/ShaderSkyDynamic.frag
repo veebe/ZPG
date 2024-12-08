@@ -1,4 +1,5 @@
 #version 450
+/* Vratislav Blunar - BLU0015 */
 in vec3 fragmentLocalPosition;
 uniform samplerCube UISky;
 
@@ -50,25 +51,8 @@ void main () {
                 skyColor *= heightFactor_night;
             }
         }
-        /*
-        if (lights[i].type == 1) {
-            vec3 lightVector = normalize(lights[i].position);
-
-            if (lights[i].position.y > 0){
-                //float log_var = log(200 * lightVector.y + 1.0) / log(200 + 1.0);
-                float log_val = log(10 * lightVector.y + 1.0) / log(10 + 1.0);
-                float log_var = 0.2f + log_val * 0.8f;
-                //dimming = dimming * log_var;
-                light_color = lights[i].color * log_var;
-                //float revers_log = 1 - log_var;
-                //vec3 orange = vec3(1,0.9,0);
-                //light_color = light_color * revers_log * orange;
-            }    
-        }*/
     }
     
-
-    //frag_colour = (vec4(light_color, 1.f) *  texColor);
     frag_colour = vec4(skyColor, 1.0) * texColor;
 }
 

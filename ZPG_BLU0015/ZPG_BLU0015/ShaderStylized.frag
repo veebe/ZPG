@@ -1,4 +1,5 @@
 #version 330
+/* Vratislav Blunar - BLU0015 */
 in vec4 ex_worldPosition;
 in vec3 ex_worldNormal;
 out vec4 frag_colour;
@@ -51,12 +52,10 @@ void main() {
 
         float dimming = 1.0 / (1.0 + (fdistance / lights[i].strength));
 
-        // Diffuse component
         float diff = max(dot(normal, lightVector), 0.0);
         vec3 diffuse = diff * lights[i].color;
         totalDiff += diff;
 
-        // Specular component
         vec3 reflectDir = reflect(-lightVector, normal);
         float spec = 0.0;
         if (diff > 0.0) {

@@ -1,4 +1,5 @@
 #pragma once
+/* Vratislav Blunar - BLU0015 */
 #include "glm/glm.hpp"
 #include "ISubject.h"
 #include "IObserver.h"

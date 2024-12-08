@@ -1,3 +1,4 @@
+/* Vratislav Blunar - BLU0015 */
 #include "ModelTextured.h"
 
 ModelTextured::ModelTextured(std::vector<float> AModel) {

@@ -1,3 +1,4 @@
+/* Vratislav Blunar - BLU0015 */
 #include "DrawableModel.h"
 #include "ModelTextured.h"
 

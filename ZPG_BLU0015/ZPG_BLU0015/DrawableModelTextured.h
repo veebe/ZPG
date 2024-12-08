@@ -1,5 +1,5 @@
 #pragma once
-
+/* Vratislav Blunar - BLU0015 */
 #include "DrawableModel.h"
 
 class DrawableModelTextured : public DrawableModel {

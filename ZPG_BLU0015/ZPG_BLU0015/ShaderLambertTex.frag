@@ -1,4 +1,5 @@
 #version 330
+/* Vratislav Blunar - BLU0015 */
 in vec4 ex_worldPosition;
 in vec3 ex_worldNormal;
 in vec2 vt_out;

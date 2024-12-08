@@ -1,3 +1,4 @@
+/* Vratislav Blunar - BLU0015 */
 #include "Model.h"
 
 Model::Model(){}

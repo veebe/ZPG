@@ -1,4 +1,6 @@
 #pragma once
+/* Vratislav Blunar - BLU0015 */
+
 #include "Model.h"
 #include "ShaderProgram.h"
 #include "Transformation.h"

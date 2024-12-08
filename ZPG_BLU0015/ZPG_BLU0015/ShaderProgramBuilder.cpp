@@ -1,3 +1,4 @@
+/* Vratislav Blunar - BLU0015 */
 #include "ShaderProgramBuilder.h"
 
 ShaderProgramBuilder::ShaderProgramBuilder() : SP(nullptr) {}

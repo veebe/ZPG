@@ -1,4 +1,5 @@
 #pragma once
+/* Vratislav Blunar - BLU0015 */
 #include <GL/glew.h>
 
 #include <glm/glm.hpp>

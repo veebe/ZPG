@@ -1,3 +1,4 @@
+/* Vratislav Blunar - BLU0015 */
 #include "Callbacks.h"
 #include "Application.h"
 #include "ClickModeType.h"
@@ -54,7 +55,7 @@ void Callbacks::key_callback(GLFWwindow* window, int key, int scancode, int acti
 		Application::getInstance().MoveActiveCamera(LEFT, Application::getInstance().GetDeltaTime());
 	}
 	*/
-	if (key == GLFW_KEY_I ) {
+	if (key == GLFW_KEY_I && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
 		
 		Application::getInstance().ChangeClickMode();
 	}
@@ -91,6 +92,9 @@ void Callbacks::button_callback(GLFWwindow* window, int button, int action, int 
 	printf("button_callback [%d,%d,%d]\n", button, action, mode);
 	if (button == 1) {
 		Application::getInstance().SetMouseButtonDown((action == 1) ? true : false);
+	}
+	else if (button == 0 && action == 1) {
+		Application::getInstance().ClickAction();
 	}
 		
 }

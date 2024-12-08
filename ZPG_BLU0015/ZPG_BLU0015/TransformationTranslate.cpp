@@ -1,3 +1,4 @@
+/* Vratislav Blunar - BLU0015 */
 #include "TransformationTranslate.h"
 
 TransformationTranslate::TransformationTranslate(float x, float y, float z, bool ARepeat) {

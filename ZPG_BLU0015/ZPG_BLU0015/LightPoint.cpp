@@ -1,3 +1,4 @@
+/* Vratislav Blunar - BLU0015 */
 #include "LightPoint.h"
 
 PointLight::PointLight() :Light(){
